@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Travel Hero Slider</title>
+  
+  <!-- Bootstrap provides grid system for responsive layouts -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  
+  <!-- Google Fonts add elegant travel-themed typography -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- GSAP handles smooth destination transitions -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      overflow-x: hidden;
+    }
+    
+    /* Main container holds entire travel slider */
+    .travel-slider-wrapper {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+    }
+    
+    /* Each destination slide fills viewport */
+    .destination-slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.6s ease;
+    }
+    
+    /* Active slide becomes visible */
+    .destination-slide.active {
+      opacity: 1;
+      visibility: visible;
+      z-index: 10;
+    }
+    
+    /* Background image fills screen with parallax effect */
+    .destination-bg {
+      position: absolute;
+      top: -10%;
+      left: -10%;
+      width: 120%;
+      height: 120%;
+      background-size: cover;
+      background-position: center;
+      transition: transform 0.3s ease-out;
+    }
+    
+    /* Dark overlay ensures text readability */
+    .overlay-gradient {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.6) 100%);
+      z-index: 2;
+    }
+    
+    /* Weather and time info display at top */
+    .destination-info-bar {
+      position: absolute;
+      top: 40px;
+      right: 40px;
+      z-index: 50;
+      display: flex;
+      gap: 30px;
+      align-items: center;
+    }
+    
+    .info-item {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(15px);
+      padding: 12px 25px;
+      border-radius: 30px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #fff;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .info-icon {
+      font-size: 1.2rem;
+    }
+    
+    /* Content section centers destination details */
+    .destination-content {
+      position: relative;
+      z-index: 20;
+      height: 100%;
+      display: flex;
+      align-items: center;
+    }
+    
+    /* Location badge shows country or region */
+    .location-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      border-radius: 25px;
+      color: #fff;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 25px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    /* Main destination name uses large serif font */
+    .destination-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 6rem;
+      font-weight: 900;
+      color: #fff;
+      line-height: 1;
+      margin-bottom: 25px;
+      text-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    }
+    
+    /* Description provides travel highlights */
+    .destination-description {
+      font-size: 1.2rem;
+      color: rgba(255, 255, 255, 0.95);
+      line-height: 1.8;
+      margin-bottom: 40px;
+      max-width: 600px;
+      font-weight: 300;
+    }
+    
+    /* Feature tags show destination highlights */
+    .feature-tags {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 45px;
+      flex-wrap: wrap;
+    }
+    
+    .feature-tag {
+      padding: 10px 20px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      color: #fff;
+      font-size: 0.85rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    /* Action buttons for booking and exploring */
+    .action-buttons {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    
+    /* Primary button has bright call to action */
+    .btn-book-now {
+      padding: 18px 45px;
+      background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+      color: #fff;
+      text-decoration: none;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 1.05rem;
+      transition: all 0.4s ease;
+      box-shadow: 0 15px 40px rgba(255, 107, 107, 0.4);
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      border: none;
+    }
+    
+    .btn-book-now:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 20px 50px rgba(255, 107, 107, 0.6);
+      color: #fff;
+    }
+    
+    /* Secondary button has outline style */
+    .btn-explore {
+      padding: 18px 45px;
+      background: transparent;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 1.05rem;
+      border: 2px solid rgba(255, 255, 255, 0.5);
+      backdrop-filter: blur(10px);
+      transition: all 0.4s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .btn-explore:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: #fff;
+      transform: translateY(-3px);
+      color: #fff;
+    }
+    
+    /* Price card shows starting rates */
+    .price-card {
+      position: absolute;
+      bottom: 100px;
+      right: 50px;
+      z-index: 30;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      padding: 30px 35px;
+      border-radius: 25px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      min-width: 280px;
+    }
+    
+    .price-label {
+      font-size: 0.85rem;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    
+    .price-amount {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #FF6B6B;
+      line-height: 1;
+      margin-bottom: 5px;
+    }
+    
+    .price-duration {
+      font-size: 0.9rem;
+      color: #999;
+    }
+    
+    .price-includes {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid #eee;
+    }
+    
+    .include-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      color: #555;
+      font-size: 0.9rem;
+    }
+    
+    .include-icon {
+      color: #4CAF50;
+      font-size: 1.1rem;
+    }
+    
+    /* Navigation controls sit at bottom center */
+    .travel-navigation {
+      position: absolute;
+      bottom: 50px;
+      left: 50px;
+      z-index: 100;
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+    
+    /* Slide counter shows current position */
+    .slide-counter {
+      color: #fff;
+      font-size: 1.1rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      padding: 15px 25px;
+      border-radius: 30px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .current-num {
+      font-size: 2rem;
+      font-weight: 700;
+    }
+    
+    .total-num {
+      opacity: 0.7;
+    }
+    
+    /* Thumbnail navigation shows upcoming destinations */
+    .thumb-nav {
+      display: flex;
+      gap: 15px;
+    }
+    
+    .thumb-item {
+      width: 80px;
+      height: 80px;
+      border-radius: 15px;
+      overflow: hidden;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.3s ease;
+      border: 3px solid transparent;
+    }
+    
+    .thumb-item:hover {
+      transform: scale(1.1);
+      border-color: rgba(255, 255, 255, 0.5);
+    }
+    
+    .thumb-item.active {
+      border-color: #fff;
+      transform: scale(1.15);
+    }
+    
+    .thumb-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .thumb-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      transition: opacity 0.3s ease;
+    }
+    
+    .thumb-item.active .thumb-overlay {
+      opacity: 0;
+    }
+    
+    /* Arrow controls for manual navigation */
+    .nav-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 100;
+      width: 65px;
+      height: 65px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(15px);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .nav-arrow:hover {
+      background: rgba(255, 255, 255, 0.25);
+      transform: translateY(-50%) scale(1.1);
+    }
+    
+    .nav-arrow.prev {
+      left: 30px;
+    }
+    
+    .nav-arrow.next {
+      right: 30px;
+    }
+    
+    .nav-arrow svg {
+      width: 26px;
+      height: 26px;
+      fill: #fff;
+    }
+    
+    /* Floating location markers add interactivity */
+    .location-marker {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      background: rgba(255, 107, 107, 0.9);
+      border-radius: 50%;
+      border: 3px solid #fff;
+      box-shadow: 0 10px 30px rgba(255, 107, 107, 0.5);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      z-index: 25;
+      animation: pulse 2s infinite;
+    }
+    
+    .location-marker:hover {
+      transform: scale(1.2);
+    }
+    
+    @keyframes pulse {
+      0%, 100% {
+        box-shadow: 0 10px 30px rgba(255, 107, 107, 0.5), 0 0 0 0 rgba(255, 107, 107, 0.7);
+      }
+      50% {
+        box-shadow: 0 10px 30px rgba(255, 107, 107, 0.5), 0 0 0 15px rgba(255, 107, 107, 0);
+      }
+    }
+    
+    /* Social proof shows traveler ratings */
+    .social-proof {
+      position: absolute;
+      top: 50%;
+      right: 50px;
+      transform: translateY(-50%);
+      z-index: 30;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      padding: 25px;
+      border-radius: 20px;
+      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
+      max-width: 250px;
+    }
+    
+    .rating-stars {
+      color: #FFB800;
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+    }
+    
+    .rating-text {
+      font-size: 0.9rem;
+      color: #666;
+      margin-bottom: 15px;
+    }
+    
+    .traveler-count {
+      font-size: 0.85rem;
+      color: #999;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    /* Responsive adjustments keep mobile looking great */
+    @media (max-width: 1200px) {
+      .destination-title {
+        font-size: 4.5rem;
+      }
+      
+      .price-card {
+        bottom: 80px;
+        right: 30px;
+      }
+      
+      .social-proof {
+        display: none;
+      }
+    }
+    
+    @media (max-width: 992px) {
+      .destination-title {
+        font-size: 3.5rem;
+      }
+      
+      .destination-info-bar {
+        top: 20px;
+        right: 20px;
+        flex-wrap: wrap;
+      }
+      
+      .price-card {
+        position: static;
+        margin-top: 30px;
+        display: inline-block;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .destination-title {
+        font-size: 2.8rem;
+      }
+      
+      .destination-description {
+        font-size: 1rem;
+      }
+      
+      .action-buttons {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .btn-book-now, .btn-explore {
+        justify-content: center;
+        padding: 15px 35px;
+      }
+      
+      .destination-info-bar {
+        display: none;
+      }
+      
+      .travel-navigation {
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .thumb-nav {
+        order: -1;
+      }
+      
+      .nav-arrow {
+        width: 50px;
+        height: 50px;
+      }
+      
+      .nav-arrow.prev {
+        left: 15px;
+      }
+      
+      .nav-arrow.next {
+        right: 15px;
+      }
+      
+      .location-marker {
+        display: none;
+      }
+    }
+    
+    @media (max-width: 576px) {
+      .destination-title {
+        font-size: 2.2rem;
+      }
+      
+      .feature-tags {
+        display: none;
+      }
+      
+      .thumb-nav {
+        gap: 10px;
+      }
+      
+      .thumb-item {
+        width: 60px;
+        height: 60px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Main travel slider wrapper -->
+<div class="travel-slider-wrapper">
+  
+  <!-- Destination 1: Tropical Paradise -->
+  <div class="destination-slide active" data-slide="0">
+    <div class="destination-bg" style="background-image: url('https://picsum.photos/id/1011/1920/1080');"></div>
+    <div class="overlay-gradient"></div>
+    
+    <!-- Weather and time info -->
+    <div class="destination-info-bar">
+      <div class="info-item">
+        <span class="info-icon">☀️</span>
+        <span>28°C Sunny</span>
+      </div>
+      <div class="info-item">
+        <span class="info-icon">🕐</span>
+        <span>Local Time 2:30 PM</span>
+      </div>
+    </div>
+    
+    <!-- Interactive location markers -->
+    <div class="location-marker" style="top: 35%; left: 45%;" title="Beach Resort"></div>
+    <div class="location-marker" style="top: 50%; left: 65%;" title="Diving Spot"></div>
+    
+    <!-- Main destination content -->
+    <div class="destination-content">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8">
+            <div data-animate="content">
+              <div class="location-badge">
+                <span>🌴</span>
+                <span>Maldives</span>
+              </div>
+              <h1 class="destination-title">Paradise Awaits</h1>
+              <p class="destination-description">
+                Discover pristine white sand beaches, crystal-clear turquoise waters, and luxury overwater villas in this tropical heaven.
+              </p>
+              <div class="feature-tags">
+                <div class="feature-tag">
+                  <span>🏖️</span>
+                  <span>Beach Resort</span>
+                </div>
+                <div class="feature-tag">
+                  <span>🤿</span>
+                  <span>Diving</span>
+                </div>
+                <div class="feature-tag">
+                  <span>🍹</span>
+                  <span>All-Inclusive</span>
+                </div>
+                <div class="feature-tag">
+                  <span>💑</span>
+                  <span>Romantic</span>
+                </div>
+              </div>
+              <div class="action-buttons">
+                <a href="#" class="btn-book-now">
+                  <span>Book Your Trip</span>
+                  <span>✈️</span>
+                </a>
+                <a href="#" class="btn-explore">
+                  <span>View Packages</span>
+                  <span>→</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Price information card -->
+    <div class="price-card">
+      <div class="price-label">Starting From</div>
+      <div class="price-amount">$1,299</div>
+      <div class="price-duration">per person / 7 days</div>
+      <div class="price-includes">
+        <div class="include-item">
+          <span class="include-icon">✓</span>
+          <span>Flights Included</span>
+        </div>
+        <div class="include-item">
+          <span class="include-icon">✓</span>
+          <span>5-Star Resort</span>
+        </div>
+        <div class="include-item">
+          <span class="include-icon">✓</span>
+          <span>All Meals</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Social proof with ratings -->
+    <div class="social-proof">
+      <div class="rating-stars">★★★★★</div>
+      <div class="rating-text">Rated 4.9/5 by travelers</div>
+      <div class="traveler-count">
+        <span>👥</span>
+        <span>12,847 happy travelers</span>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Destination 2: Mountain Adventure -->
+  <div class="destination-slide" data-slide="1">
+    <div class="destination-bg" style="background-image: url('https://picsum.photos/id/1036/1920/1080');"></div>
+    <div class="overlay-gradient"></div>
+    
+    <div class="destination-info-bar">
+      <div class="info-item">
+        <span class="info-icon">🌤️</span>
+        <span>15°C Partly Cloudy</span>
+      </div>
+      <div class="info-item">
+        <span class="info-icon">🕐</span>
+        <span>Local Time 10:15 AM</span>
+      </div>
+    </div>
+    
+    <div class="location-marker" style="top: 30%; left: 55%;" title="Summit View"></div>
+    <div class="location-marker" style="top: 60%; left: 40%;" title="Base Camp"></div>
+    
+    <div class="destination-content">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8">
+            <div data-animate="content">
+              <div class="location-badge">
+                <span>⛰️</span>
+                <span>Swiss Alps</span>
+              </div>
+              <h1 class="destination-title">Alpine Wonder</h1>
+              <p class="destination-description">
+                Experience breathtaking mountain peaks, pristine hiking trails, and charming alpine villages in the heart of Switzerland.
+              </p>
+              <div class="feature-tags">
+                <div class="feature-tag">
+                  <span>🥾</span>
+                  <span>Hiking</span>
+                </div>
+                <div class="feature-tag">
+                  <span>⛷️</span>
+                  <span>Skiing</span>
+                </div>
+                <div class="feature-tag">
+                  <span>📸</span>
+                  <span>Photography</span>
+                </div>
+                <div class="feature-tag">
+                  <span>🏔️</span>
+                  <span>Adventure</span>
+                </div>
+              </div>
+              <div class="action-buttons">
+                <a href="#" class="btn-book-now">
+                  <span>Book Your Trip</span>
+                  <span>✈️</span>
+                </a>
+                <a href="#" class="btn-explore">
+                  <span>View Packages</span>
+                  <span>→</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="price-card">
+      <div class="price-label">Starting From</div>
+      <div class="price-amount">$1,799</div>
+      <div class="price-duration">per person / 10 days</div>
+      <div class="price-includes">
+        <div class="include-item">
+          <span class="include-icon">✓</span>
+          <span>Mountain Lodge</span>
+        </div>
+        <div class="include-item">
+          <span class="include-icon">✓</span>
+          <span>Guided Tours</span>
+        </div>
+        <div class="include-item">
+          <span class="include-icon">✓</span>
+          <span>Equipment</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="social-proof">
+      <div class="rating-stars">★★★★★</div>
+      <div class="rating-text">Rated 4.8/5 by travelers</div>
+      <div class="traveler-count">
+        <span>👥</span>
+        <span>8,432 happy travelers</span>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Destination 3: City Explorer -->
+  <div class="destination-slide" data-slide="2">
+    <div class="destination-bg" style="background-image: url('https://picsum.photos/id/1031/1920/1080');"></div>
+    <div class="overlay-gradient"></div>
+    
+    <div class="destination-info-bar">
+      <div class="info-item">
+        <span class="info-icon">🌆</span>
+        <span>22°C Clear</span>
+      </div>
+      <div class="info-item">
+        <span class="info-icon">🕐</span>
+        <span>Local Time 8:45 PM</span>
+      </div>
+    </div>
+    
+    <div class="location-marker" style="top: 40%; left: 50%;" title="City Center"></div>
+    <div class="location-marker" style="top: 55%; left: 70%;" title="Harbor View"></div>
+    
+    <div class="destination-content">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8">
+            <div data-animate="content">
+              <div class="location-badge">
+                <span>🗼</span>
+                <span>Paris, France</span>
+              </div>
+              <h1 class="destination-title">City of Lights</h1>
+              <p class="destination-description">
+                Immerse yourself in art, culture, and romance. Explore iconic landmarks, world-class museums, and exquisite French cuisine.
+              </p>
+              <div class="feature-tags">
+                <div class="feature-tag">
+                  <span>🎨</span>
+                  <span>Museums</span>
+                </div>
+                <div class="feature-tag">
+                  <span>🍷</span>
+                  <span>Fine Dining</span>
+                </div>
+                <div class="feature-tag">
+                  <span>🛍️</span>
+                  <span>Shopping</span>
+                </div>
+                <div class="feature-tag">
+                  <span>🏛️</span>
+                  <span>History</span>
+                </div>
+              </div>
+              <div class="action-buttons">
+                <a href="#" class="btn-book-now">
+                  <span>Book Your Trip</span>
+                  <span>✈️</span>
+                </a>
+                <a href="#" class="btn-explore">
+                  <span>View Packages</span>
+                  <span>→</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="price-card">
+      <div class="price-label">Starting From</div>
+      <div class="price-amount">$999</div>
+      <div class="price-duration">per person / 5 days</div>
+      <div class="price-includes">
+        <div class="include-item">
+          <span class="include-icon">✓</span>
+          <span>City Center Hotel</span>
+        </div>
+        <div class="include-item">
+          <span class="include-icon">✓</span>
+          <span>Skip-the-Line Tours</span>
+        </div>
+        <div class="include-item">
+          <span class="include-icon">✓</span>
+          <span>Metro Pass</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="social-proof">
+      <div class="rating-stars">★★★★★</div>
+      <div class="rating-text">Rated 4.9/5 by travelers</div>
+      <div class="traveler-count">
+        <span>👥</span>
+        <span>21,563 happy travelers</span>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Destination 4: Desert Safari -->
+  <div class="destination-slide" data-slide="3">
+    <div class="destination-bg" style="background-image: url('https://picsum.photos/id/247/1920/1080');"></div>
+    <div class="overlay-gradient"></div>
+    
+    <div class="destination-info-bar">
+      <div class="info-item">
+        <span class="info-icon">🌞</span>
+        <span>35°C Hot & Dry</span>
+      </div>
+      <div class="info-item">
+        <span class="info-icon">🕐</span>
+        <span>Local Time 4:00 PM</span>
+      </div>
+    </div>
+    
+    <div class="location-marker" style="top: 45%; left: 35%;" title="Desert Camp"></div>
+    <div class="location-marker" style="top: 35%; left: 60%;" title="Camel Ride Start"></div>
+    
+    <div class="destination-content">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8">
+            <div data-animate="content">
+              <div class="location-badge">
+                <span>🏜️</span>
+                <span>Dubai, UAE</span>
+              </div>
+              <h1 class="destination-title">Desert Dreams</h1>
+              <p class="destination-description">
+                Experience the magic of endless golden dunes, traditional Bedouin camps, and thrilling desert adventures under starlit skies.
+              </p>
+              <div class="feature-tags">
+                <div class="feature-tag">
+                  <span>🐪</span>
+                  <span>Camel Safari</span>
+                </div>
+                <div class="feature-tag">
+                  <span>🏎️</span>
+                  <span>Dune Bashing</span>
+                </div>
+                <div class="feature-tag">
+                  <span>⭐</span>
+                  <span>Stargazing</span>
+                </div>
+                <div class="feature-tag">
+                  <span>🎪</span>
+                  <span>Cultural Show</span>
+                </div>
+              </div>
+              <div class="action-buttons">
+                <a href="#" class="btn-book-now">
+                  <span>Book Your Trip</span>
+                  <span>✈️</span>
+                </a>
+                <a href="#" class="btn-explore">
+                  <span>View Packages</span>
+                  <span>→</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="price-card">
+      <div class="price-label">Starting From</div>
+      <div class="price-amount">$899</div>
+      <div class="price-duration">per person / 6 days</div>
+      <div class="price-includes">
+        <div class="include-item">
+          <span class="include-icon">✓</span>
+          <span>Luxury Hotel</span>
+        </div>
+        <div class="include-item">
+          <span class="include-icon">✓</span>
+          <span>Desert Safari</span>
+        </div>
+        <div class="include-item">
+          <span class="include-icon">✓</span>
+          <span>City Tours</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="social-proof">
+      <div class="rating-stars">★★★★★</div>
+      <div class="rating-text">Rated 4.7/5 by travelers</div>
+      <div class="traveler-count">
+        <span>👥</span>
+        <span>15,291 happy travelers</span>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Navigation controls -->
+  <div class="travel-navigation">
+    <div class="slide-counter">
+      <span class="current-num">01</span>
+      <span class="separator">/</span>
+      <span class="total-num">04</span>
+    </div>
+    <div class="thumb-nav">
+      <div class="thumb-item active" data-slide="0">
+        <img src="https://picsum.photos/id/1011/200/200" alt="Maldives">
+        <div class="thumb-overlay"></div>
+      </div>
+      <div class="thumb-item" data-slide="1">
+        <img src="https://picsum.photos/id/1036/200/200" alt="Swiss Alps">
+        <div class="thumb-overlay"></div>
+      </div>
+      <div class="thumb-item" data-slide="2">
+        <img src="https://picsum.photos/id/1031/200/200" alt="Paris">
+        <div class="thumb-overlay"></div>
+      </div>
+      <div class="thumb-item" data-slide="3">
+        <img src="https://picsum.photos/id/247/200/200" alt="Dubai">
+        <div class="thumb-overlay"></div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Arrow navigation -->
+  <div class="nav-arrow prev">
+    <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+  </div>
+  <div class="nav-arrow next">
+    <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+  </div>
+  
+</div>
+
+<!-- Bootstrap JS for responsive behavior -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+// Travel slider management system
+const slides = document.querySelectorAll('.destination-slide');
+const thumbItems = document.querySelectorAll('.thumb-item');
+const prevArrow = document.querySelector('.nav-arrow.prev');
+const nextArrow = document.querySelector('.nav-arrow.next');
+const currentNumDisplay = document.querySelector('.current-num');
+
+let currentSlide = 0;
+let isTransitioning = false;
+const totalSlides = slides.length;
+
+// Function handles smooth destination transitions
+function goToSlide(targetIndex) {
+  if (isTransitioning || targetIndex === currentSlide) return;
+  isTransitioning = true;
+  
+  const currentSlideEl = slides[currentSlide];
+  const targetSlideEl = slides[targetIndex];
+  
+  // Fade out current destination
+  gsap.to(currentSlideEl, {
+    opacity: 0,
+    duration: 0.6,
+    ease: 'power2.inOut',
+    onComplete: () => {
+      currentSlideEl.classList.remove('active');
+    }
+  });
+  
+  // Fade in new destination
+  targetSlideEl.classList.add('active');
+  gsap.fromTo(targetSlideEl,
+    { opacity: 0 },
+    { 
+      opacity: 1,
+      duration: 0.6,
+      ease: 'power2.inOut',
+      onComplete: () => {
+        isTransitioning = false;
+      }
+    }
+  );
+  
+  // Animate destination content
+  const contentEl = targetSlideEl.querySelector('[data-animate="content"]');
+  gsap.fromTo(contentEl,
+    { y: 60, opacity: 0 },
+    {
+      y: 0,
+      opacity: 1,
+      duration: 1,
+      ease: 'power3.out',
+      delay: 0.3
+    }
+  );
+  
+  // Update thumbnail navigation
+  thumbItems[currentSlide].classList.remove('active');
+  thumbItems[targetIndex].classList.add('active');
+  
+  // Update slide counter
+  currentNumDisplay.textContent = String(targetIndex + 1).padStart(2, '0');
+  
+  currentSlide = targetIndex;
+}
+
+// Thumbnail click handlers
+thumbItems.forEach(thumb => {
+  thumb.addEventListener('click', () => {
+    goToSlide(parseInt(thumb.dataset.slide));
+  });
+});
+
+// Arrow navigation
+prevArrow.addEventListener('click', () => {
+  const prevIndex = (currentSlide - 1 + totalSlides) % totalSlides;
+  goToSlide(prevIndex);
+});
+
+nextArrow.addEventListener('click', () => {
+  const nextIndex = (currentSlide + 1) % totalSlides;
+  goToSlide(nextIndex);
+});
+
+// Keyboard navigation support
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowLeft') {
+    prevArrow.click();
+  } else if (e.key === 'ArrowRight') {
+    nextArrow.click();
+  }
+});
+
+// Parallax effect on mouse movement
+document.addEventListener('mousemove', (e) => {
+  const moveX = (e.clientX - window.innerWidth / 2) / window.innerWidth;
+  const moveY = (e.clientY - window.innerHeight / 2) / window.innerHeight;
+  
+  const activeBg = document.querySelector('.destination-slide.active .destination-bg');
+  if (activeBg) {
+    gsap.to(activeBg, {
+      x: moveX * 40,
+      y: moveY * 40,
+      duration: 0.5,
+      ease: 'power2.out'
+    });
+  }
+});
+
+// Autoplay functionality
+let autoplayInterval = setInterval(() => {
+  nextArrow.click();
+}, 8000);
+
+// Pause autoplay on user interaction
+document.querySelector('.travel-slider-wrapper').addEventListener('mouseenter', () => {
+  clearInterval(autoplayInterval);
+});
+
+document.querySelector('.travel-slider-wrapper').addEventListener('mouseleave', () => {
+  autoplayInterval = setInterval(() => {
+    nextArrow.click();
+  }, 8000);
+});
+
+// Initial content animation on page load
+window.addEventListener('load', () => {
+  const firstContent = slides[0].querySelector('[data-animate="content"]');
+  gsap.fromTo(firstContent,
+    { y: 80, opacity: 0 },
+    {
+      y: 0,
+      opacity: 1,
+      duration: 1.2,
+      ease: 'power3.out',
+      delay: 0.5
+    }
+  );
+});
+</script>
+
+</body>
+</html>
