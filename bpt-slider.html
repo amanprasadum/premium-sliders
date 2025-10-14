@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>B. P Trading Fabric Slider</title>
+  
+  <!-- Bootstrap handles responsive grid layout -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  
+  <!-- Google Fonts provide elegant professional typography -->
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- GSAP creates smooth fabric-like animations -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Montserrat', sans-serif;
+      overflow-x: hidden;
+    }
+    
+    /* Main wrapper contains entire fabric showcase */
+    .fabric-slider-wrapper {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+      background: #ffffff;
+    }
+    
+    /* Each fabric slide displays collection */
+    .fabric-slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.8s ease;
+    }
+    
+    /* Active slide becomes visible */
+    .fabric-slide.active {
+      opacity: 1;
+      visibility: visible;
+      z-index: 10;
+    }
+    
+    /* Split layout divides image and content */
+    .slide-split {
+      display: flex;
+      height: 100%;
+      align-items: center;
+    }
+    
+    .image-section {
+      flex: 1;
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .content-section {
+      flex: 1;
+      padding: 80px 100px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background: linear-gradient(135deg, #ffffff 0%, #f3f3f3 100%);
+      position: relative;
+    }
+    
+    /* Fabric image shows texture and pattern */
+    .fabric-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease-out;
+    }
+    
+    .image-section:hover .fabric-image {
+      transform: scale(1.05);
+    }
+    
+    /* Pattern overlay adds textile texture effect */
+    .pattern-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        repeating-linear-gradient(
+          45deg,
+          transparent,
+          transparent 10px,
+          rgba(255,255,255,0.03) 10px,
+          rgba(255,255,255,0.03) 20px
+        );
+      pointer-events: none;
+      z-index: 5;
+    }
+    
+    /* Company logo sits at top left */
+    .company-logo {
+      position: absolute;
+      top: 40px;
+      left: 50px;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.95);
+      padding: 20px 35px;
+      border-radius: 10px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    }
+    
+    .logo-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #2c3e50;
+      line-height: 1.2;
+    }
+    
+    .logo-subtitle {
+      font-size: 0.7rem;
+      color: #7f8c8d;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-top: 3px;
+    }
+    
+    /* Category badge shows fabric type */
+    .category-badge {
+      display: inline-block;
+      padding: 8px 20px;
+      background: #2c3e50;
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 25px;
+      border-radius: 3px;
+    }
+    
+    /* Main heading uses elegant serif font */
+    .fabric-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 4.5rem;
+      font-weight: 700;
+      color: #2c3e50;
+      line-height: 1.1;
+      margin-bottom: 25px;
+    }
+    
+    /* Accent line uses brand pink color */
+    .title-accent {
+      width: 80px;
+      height: 4px;
+      background: linear-gradient(90deg, #ff006e 0%, #ff0080 100%);
+      margin-bottom: 30px;
+    }
+    
+    /* Description explains fabric features */
+    .fabric-description {
+      font-size: 1.1rem;
+      color: #555;
+      line-height: 1.9;
+      margin-bottom: 35px;
+      font-weight: 400;
+    }
+    
+    /* Specifications list shows fabric details */
+    .fabric-specs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+    
+    .spec-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 15px;
+      background: rgba(255, 0, 110, 0.05);
+      border-radius: 8px;
+      border-left: 3px solid #ff006e;
+    }
+    
+    .spec-icon {
+      font-size: 1.5rem;
+    }
+    
+    .spec-content {
+      flex: 1;
+    }
+    
+    .spec-label {
+      font-size: 0.75rem;
+      color: #999;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 3px;
+    }
+    
+    .spec-value {
+      font-size: 1rem;
+      color: #2c3e50;
+      font-weight: 600;
+    }
+    
+    /* Action buttons for wholesale inquiry */
+    .action-buttons {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    
+    /* Primary button uses brand pink color */
+    .btn-inquiry {
+      padding: 18px 45px;
+      background: linear-gradient(135deg, #ff006e 0%, #ff0080 100%);
+      color: #fff;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: 600;
+      font-size: 1rem;
+      transition: all 0.4s ease;
+      box-shadow: 0 10px 30px rgba(255, 0, 110, 0.3);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border: none;
+    }
+    
+    .btn-inquiry:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 40px rgba(255, 0, 110, 0.5);
+      color: #fff;
+    }
+    
+    /* Secondary button has outline style */
+    .btn-catalog {
+      padding: 18px 45px;
+      background: transparent;
+      color: #2c3e50;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: 600;
+      font-size: 1rem;
+      border: 2px solid #2c3e50;
+      transition: all 0.4s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    .btn-catalog:hover {
+      background: #2c3e50;
+      color: #fff;
+      transform: translateY(-3px);
+    }
+    
+    /* Quality badge shows certifications */
+    .quality-badge {
+      position: absolute;
+      bottom: 50px;
+      left: 50px;
+      z-index: 50;
+      background: rgba(255, 255, 255, 0.95);
+      padding: 25px 30px;
+      border-radius: 10px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      border-left: 4px solid #ff006e;
+    }
+    
+    .quality-icon {
+      font-size: 3rem;
+    }
+    
+    .quality-text {
+      flex: 1;
+    }
+    
+    .quality-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #2c3e50;
+      margin-bottom: 5px;
+    }
+    
+    .quality-subtitle {
+      font-size: 0.85rem;
+      color: #7f8c8d;
+    }
+    
+    /* Navigation controls sit at bottom */
+    .fabric-navigation {
+      position: absolute;
+      bottom: 50px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+    
+    .nav-dot {
+      width: 50px;
+      height: 4px;
+      background: rgba(44, 62, 80, 0.3);
+      cursor: pointer;
+      transition: all 0.4s ease;
+      border-radius: 2px;
+    }
+    
+    .nav-dot:hover {
+      background: rgba(44, 62, 80, 0.5);
+    }
+    
+    .nav-dot.active {
+      background: linear-gradient(90deg, #ff006e 0%, #ff0080 100%);
+      width: 80px;
+    }
+    
+    /* Arrow navigation for manual control */
+    .slide-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 100;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.95);
+      border: 2px solid rgba(44, 62, 80, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+    
+    .slide-arrow:hover {
+      background: #ff006e;
+      transform: translateY(-50%) scale(1.1);
+      border-color: #ff006e;
+    }
+    
+    .slide-arrow:hover svg {
+      fill: #fff;
+    }
+    
+    .slide-arrow.prev {
+      left: 40px;
+    }
+    
+    .slide-arrow.next {
+      right: 40px;
+    }
+    
+    .slide-arrow svg {
+      width: 24px;
+      height: 24px;
+      fill: #2c3e50;
+      transition: fill 0.3s ease;
+    }
+    
+    /* Decorative fabric pattern element */
+    .fabric-pattern-bg {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 40%;
+      height: 100%;
+      opacity: 0.03;
+      background-image: 
+        repeating-linear-gradient(
+          0deg,
+          #2c3e50,
+          #2c3e50 2px,
+          transparent 2px,
+          transparent 20px
+        ),
+        repeating-linear-gradient(
+          90deg,
+          #2c3e50,
+          #2c3e50 2px,
+          transparent 2px,
+          transparent 20px
+        );
+      pointer-events: none;
+    }
+    
+    /* Contact info displays business details */
+    .contact-bar {
+      position: absolute;
+      top: 40px;
+      right: 50px;
+      z-index: 100;
+      display: flex;
+      gap: 30px;
+    }
+    
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.95);
+      padding: 12px 20px;
+      border-radius: 8px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+      font-size: 0.9rem;
+      color: #2c3e50;
+    }
+    
+    .contact-icon {
+      font-size: 1.2rem;
+      color: #ff006e;
+    }
+    
+    /* Responsive adjustments maintain quality on mobile */
+    @media (max-width: 1400px) {
+      .fabric-title {
+        font-size: 3.5rem;
+      }
+      
+      .content-section {
+        padding: 60px 80px;
+      }
+    }
+    
+    @media (max-width: 1200px) {
+      .fabric-title {
+        font-size: 3rem;
+      }
+      
+      .content-section {
+        padding: 50px 60px;
+      }
+      
+      .contact-bar {
+        flex-direction: column;
+        gap: 10px;
+      }
+    }
+    
+    @media (max-width: 992px) {
+      .slide-split {
+        flex-direction: column;
+      }
+      
+      .image-section, .content-section {
+        flex: none;
+        width: 100%;
+        height: 50%;
+      }
+      
+      .content-section {
+        padding: 40px;
+      }
+      
+      .fabric-title {
+        font-size: 2.5rem;
+      }
+      
+      .fabric-specs {
+        grid-template-columns: 1fr;
+        gap: 15px;
+      }
+      
+      .quality-badge {
+        display: none;
+      }
+      
+      .contact-bar {
+        display: none;
+      }
+      
+      .company-logo {
+        top: 20px;
+        left: 20px;
+        padding: 15px 25px;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .fabric-title {
+        font-size: 2rem;
+      }
+      
+      .fabric-description {
+        font-size: 1rem;
+      }
+      
+      .action-buttons {
+        flex-direction: column;
+      }
+      
+      .btn-inquiry, .btn-catalog {
+        width: 100%;
+        text-align: center;
+        justify-content: center;
+        padding: 15px 35px;
+      }
+      
+      .slide-arrow {
+        width: 50px;
+        height: 50px;
+      }
+      
+      .slide-arrow.prev {
+        left: 20px;
+      }
+      
+      .slide-arrow.next {
+        right: 20px;
+      }
+      
+      .fabric-navigation {
+        bottom: 30px;
+      }
+      
+      .logo-text {
+        font-size: 1.4rem;
+      }
+    }
+    
+    @media (max-width: 576px) {
+      .content-section {
+        padding: 30px 20px;
+      }
+      
+      .fabric-title {
+        font-size: 1.8rem;
+      }
+      
+      .category-badge {
+        font-size: 0.7rem;
+        padding: 6px 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Company logo at top left -->
+<div class="company-logo">
+  <div class="logo-text">B. P Trading</div>
+  <div class="logo-subtitle">Pvt Ltd</div>
+</div>
+
+<!-- Contact information at top right -->
+<div class="contact-bar">
+  <div class="contact-item">
+    <span class="contact-icon">📞</span>
+    <span>+91 91238 74566</span>
+  </div>
+  <div class="contact-item">
+    <span class="contact-icon">✉️</span>
+    <span>sales@bptgroup.in</span>
+  </div>
+</div>
+
+<!-- Main fabric slider wrapper -->
+<div class="fabric-slider-wrapper">
+  
+  <!-- Slide 1: Cotton Fabric Collection -->
+  <div class="fabric-slide active" data-slide="0">
+    <div class="slide-split">
+      <div class="image-section">
+        <img src="https://www.bptgroup.in/wp-content/uploads/2025/10/tailour-2.png" alt="Cotton Fabric" class="fabric-image">
+        <div class="pattern-overlay"></div>
+        
+        <!-- Quality certification badge -->
+        <div class="quality-badge">
+          <div class="quality-icon">🌿</div>
+          <div class="quality-text">
+            <div class="quality-title">Pure Cotton</div>
+            <div class="quality-subtitle">Soft & Breathable</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="content-section">
+        <div class="fabric-pattern-bg"></div>
+        
+        <div data-animate="content">
+          <div class="category-badge">Cotton Fabric</div>
+          <h1 class="fabric-title">Premium Cotton Collection</h1>
+          <div class="title-accent"></div>
+          <p class="fabric-description">
+            Soft, breathable, and skin-friendly cotton fabrics ideal for Indian weather. Perfect for women's kurtis, men's shirts, kids' garments, and casual wear. Available in multiple qualities and finishes.
+          </p>
+          
+          <!-- Fabric specifications -->
+          <div class="fabric-specs">
+            <div class="spec-item">
+              <span class="spec-icon">🧵</span>
+              <div class="spec-content">
+                <div class="spec-label">Qualities</div>
+                <div class="spec-value">60×60, 40×40, 100×120</div>
+              </div>
+            </div>
+            <div class="spec-item">
+              <span class="spec-icon">📐</span>
+              <div class="spec-content">
+                <div class="spec-label">Types</div>
+                <div class="spec-value">Poplin, Cambric, Voile</div>
+              </div>
+            </div>
+            <div class="spec-item">
+              <span class="spec-icon">✨</span>
+              <div class="spec-content">
+                <div class="spec-label">Varieties</div>
+                <div class="spec-value">Slub, Handloom, Organic</div>
+              </div>
+            </div>
+            <div class="spec-item">
+              <span class="spec-icon">👕</span>
+              <div class="spec-content">
+                <div class="spec-label">Uses</div>
+                <div class="spec-value">Kurti, Shirts, Kidswear</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Call to action buttons -->
+          <div class="action-buttons">
+            <a href="mailto:sales@bptgroup.in" class="btn-inquiry">Request Quote</a>
+            <a href="tel:+919123874566" class="btn-catalog">Call Now</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Slide 2: Rayon Fabric Collection -->
+  <div class="fabric-slide" data-slide="1">
+    <div class="slide-split">
+      <div class="image-section">
+        <img src="https://www.bptgroup.in/wp-content/uploads/2025/10/models-outdoor-1.png" alt="Rayon Fabric" class="fabric-image">
+        <div class="pattern-overlay"></div>
+        
+        <div class="quality-badge">
+          <div class="quality-icon">🌸</div>
+          <div class="quality-text">
+            <div class="quality-title">Premium Rayon</div>
+            <div class="quality-subtitle">Flowy & Elegant</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="content-section">
+        <div class="fabric-pattern-bg"></div>
+        
+        <div data-animate="content">
+          <div class="category-badge">Rayon Fabric</div>
+          <h1 class="fabric-title">Elegant Rayon Collection</h1>
+          <div class="title-accent"></div>
+          <p class="fabric-description">
+            Soft, flowy drape with excellent color absorption. Wrinkle-resistant and comfortable rayon perfect for women's kurtis, dresses, gowns, palazzos, and men's Indo-western wear.
+          </p>
+          
+          <div class="fabric-specs">
+            <div class="spec-item">
+              <span class="spec-icon">⚖️</span>
+              <div class="spec-content">
+                <div class="spec-label">Weights</div>
+                <div class="spec-value">14kg, 12kg, 10kg</div>
+              </div>
+            </div>
+            <div class="spec-item">
+              <span class="spec-icon">🎨</span>
+              <div class="spec-content">
+                <div class="spec-label">Types</div>
+                <div class="spec-value">Slub, Crepe, Flex, Twill</div>
+              </div>
+            </div>
+            <div class="spec-item">
+              <span class="spec-icon">✨</span>
+              <div class="spec-content">
+                <div class="spec-label">Quality</div>
+                <div class="spec-value">Premium Viscose Rayon</div>
+              </div>
+            </div>
+            <div class="spec-item">
+              <span class="spec-icon">👗</span>
+              <div class="spec-content">
+                <div class="spec-label">Uses</div>
+                <div class="spec-value">Kurtis, Dresses, Gowns</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="action-buttons">
+            <a href="mailto:sales@bptgroup.in" class="btn-inquiry">Request Quote</a>
+            <a href="tel:+919123874566" class="btn-catalog">Call Now</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Slide 3: Lycra Fabric Collection -->
+  <div class="fabric-slide" data-slide="2">
+    <div class="slide-split">
+      <div class="image-section">
+        <img src="https://www.bptgroup.in/wp-content/uploads/2025/10/Screenshot-2025-10-06-151346.png" alt="Lycra Fabric" class="fabric-image">
+        <div class="pattern-overlay"></div>
+        
+        <div class="quality-badge">
+          <div class="quality-icon">🧘</div>
+          <div class="quality-text">
+            <div class="quality-title">Stretch Comfort</div>
+            <div class="quality-subtitle">High Elasticity</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="content-section">
+        <div class="fabric-pattern-bg"></div>
+        
+        <div data-animate="content">
+          <div class="category-badge">Lycra Fabric</div>
+          <h1 class="fabric-title">Comfort Stretch Lycra</h1>
+          <div class="title-accent"></div>
+          <p class="fabric-description">
+            High elasticity for perfect comfort fit. Durable and stylish lycra fabrics ideal for leggings, jeggings, sportswear, activewear, and men's stretch shirts.
+          </p>
+          
+          <div class="fabric-specs">
+            <div class="spec-item">
+              <span class="spec-icon">🔄</span>
+              <div class="spec-content">
+                <div class="spec-label">Stretch</div>
+                <div class="spec-value">2-Way, 4-Way Lycra</div>
+              </div>
+            </div>
+            <div class="spec-item">
+              <span class="spec-icon">🧵</span>
+              <div class="spec-content">
+                <div class="spec-label">Blends</div>
+                <div class="spec-value">Viscose, Cotton, Poly</div>
+              </div>
+            </div>
+            <div class="spec-item">
+              <span class="spec-icon">💪</span>
+              <div class="spec-content">
+                <div class="spec-label">Features</div>
+                <div class="spec-value">Body Stretch & Recovery</div>
+              </div>
+            </div>
+            <div class="spec-item">
+              <span class="spec-icon">🏃</span>
+              <div class="spec-content">
+                <div class="spec-label">Uses</div>
+                <div class="spec-value">Sportswear, Activewear</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="action-buttons">
+            <a href="mailto:sales@bptgroup.in" class="btn-inquiry">Request Quote</a>
+            <a href="tel:+919123874566" class="btn-catalog">Call Now</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Slide 4: Polyester & Custom Services -->
+  <div class="fabric-slide" data-slide="3">
+    <div class="slide-split">
+      <div class="image-section">
+        <img src="https://www.bptgroup.in/wp-content/uploads/2025/10/Screenshot-2025-10-06-193448.png" alt="Custom Services" class="fabric-image">
+        <div class="pattern-overlay"></div>
+        
+        <div class="quality-badge">
+          <div class="quality-icon">🎨</div>
+          <div class="quality-text">
+            <div class="quality-title">Custom Dyeing</div>
+            <div class="quality-subtitle">32+ Colors Available</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="content-section">
+        <div class="fabric-pattern-bg"></div>
+        
+        <div data-animate="content">
+          <div class="category-badge">Polyester & Custom Services</div>
+          <h1 class="fabric-title">Full Customization</h1>
+          <div class="title-accent"></div>
+          <p class="fabric-description">
+            We offer complete customization for dyeing and printing. Custom shades in 32+ colors, printing in 1000+ designs annually. Perfect for sarees, dresses, kurtis, and uniform fabrics.
+          </p>
+          
+          <div class="fabric-specs">
+            <div class="spec-item">
+              <span class="spec-icon">🎨</span>
+              <div class="spec-content">
+                <div class="spec-label">Custom Dyeing</div>
+                <div class="spec-value">32+ Color Shades</div>
+              </div>
+            </div>
+            <div class="spec-item">
+              <span class="spec-icon">🖨️</span>
+              <div class="spec-content">
+                <div class="spec-label">Printing</div>
+                <div class="spec-value">1000+ Designs/Year</div>
+              </div>
+            </div>
+            <div class="spec-item">
+              <span class="spec-icon">🏭</span>
+              <div class="spec-content">
+                <div class="spec-label">Capacity</div>
+                <div class="spec-value">2 Crore Metres/Year</div>
+              </div>
+            </div>
+            <div class="spec-item">
+              <span class="spec-icon">🤝</span>
+              <div class="spec-content">
+                <div class="spec-label">Service</div>
+                <div class="spec-value">Whitelabel Available</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="action-buttons">
+            <a href="mailto:sales@bptgroup.in" class="btn-inquiry">Request Quote</a>
+            <a href="tel:+919123874566" class="btn-catalog">Call Now</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Navigation controls at bottom center -->
+  <div class="fabric-navigation">
+    <div class="nav-dot active" data-slide="0"></div>
+    <div class="nav-dot" data-slide="1"></div>
+    <div class="nav-dot" data-slide="2"></div>
+    <div class="nav-dot" data-slide="3"></div>
+  </div>
+  
+  <!-- Arrow navigation buttons -->
+  <div class="slide-arrow prev">
+    <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+  </div>
+  <div class="slide-arrow next">
+    <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+  </div>
+  
+</div>
+
+<!-- Bootstrap JS provides responsive utilities -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+// Fabric slider control system
+const slides = document.querySelectorAll('.fabric-slide');
+const navDots = document.querySelectorAll('.nav-dot');
+const prevArrow = document.querySelector('.slide-arrow.prev');
+const nextArrow = document.querySelector('.slide-arrow.next');
+
+let currentSlide = 0;
+let isAnimating = false;
+const totalSlides = slides.length;
+
+// Function handles fabric slide transitions
+function changeSlide(targetIndex) {
+  if (isAnimating || targetIndex === currentSlide) return;
+  isAnimating = true;
+  
+  const currentSlideEl = slides[currentSlide];
+  const targetSlideEl = slides[targetIndex];
+  
+  // Fade out current fabric display
+  gsap.to(currentSlideEl, {
+    opacity: 0,
+    duration: 0.6,
+    ease: 'power2.inOut',
+    onComplete: () => {
+      currentSlideEl.classList.remove('active');
+    }
+  });
+  
+  // Fade in new fabric collection
+  targetSlideEl.classList.add('active');
+  gsap.fromTo(targetSlideEl,
+    { opacity: 0 },
+    {
+      opacity: 1,
+      duration: 0.6,
+      ease: 'power2.inOut',
+      onComplete: () => {
+        isAnimating = false;
+      }
+    }
+  );
+  
+  // Animate content with elegant slide effect
+  const contentEl = targetSlideEl.querySelector('[data-animate="content"]');
+  if (contentEl) {
+    gsap.fromTo(contentEl,
+      { x: 50, opacity: 0 },
+      {
+        x: 0,
+        opacity: 1,
+        duration: 1,
+        ease: 'power3.out',
+        delay: 0.3
+      }
+    );
+  }
+  
+  // Update navigation dots
+  navDots[currentSlide].classList.remove('active');
+  navDots[targetIndex].classList.add('active');
+  
+  currentSlide = targetIndex;
+}
+
+// Navigation dot click handlers
+navDots.forEach(dot => {
+  dot.addEventListener('click', () => {
+    changeSlide(parseInt(dot.dataset.slide));
+  });
+});
+
+// Arrow navigation functionality
+prevArrow.addEventListener('click', () => {
+  const prevIndex = (currentSlide - 1 + totalSlides) % totalSlides;
+  changeSlide(prevIndex);
+});
+
+nextArrow.addEventListener('click', () => {
+  const nextIndex = (currentSlide + 1) % totalSlides;
+  changeSlide(nextIndex);
+});
+
+// Keyboard navigation support
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowLeft') {
+    prevArrow.click();
+  } else if (e.key === 'ArrowRight') {
+    nextArrow.click();
+  }
+});
+
+// Subtle parallax on mouse movement
+document.addEventListener('mousemove', (e) => {
+  const moveX = (e.clientX - window.innerWidth / 2) / window.innerWidth;
+  const moveY = (e.clientY - window.innerHeight / 2) / window.innerHeight;
+  
+  const activeFabricImage = document.querySelector('.fabric-slide.active .fabric-image');
+  if (activeFabricImage) {
+    gsap.to(activeFabricImage, {
+      x: moveX * 20,
+      y: moveY * 20,
+      duration: 0.5,
+      ease: 'power2.out'
+    });
+  }
+});
+
+// Autoplay with pause on hover
+let autoplayInterval = setInterval(() => {
+  nextArrow.click();
+}, 7000);
+
+document.querySelector('.fabric-slider-wrapper').addEventListener('mouseenter', () => {
+  clearInterval(autoplayInterval);
+});
+
+document.querySelector('.fabric-slider-wrapper').addEventListener('mouseleave', () => {
+  autoplayInterval = setInterval(() => {
+    nextArrow.click();
+  }, 7000);
+});
+
+// Initial content animation on load
+window.addEventListener('load', () => {
+  const firstContent = slides[0].querySelector('[data-animate="content"]');
+  if (firstContent) {
+    gsap.fromTo(firstContent,
+      { x: 60, opacity: 0 },
+      {
+        x: 0,
+        opacity: 1,
+        duration: 1.2,
+        ease: 'power3.out',
+        delay: 0.5
+      }
+    );
+  }
+});
+</script>
+
+</body>
+</html>
