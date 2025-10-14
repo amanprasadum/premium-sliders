@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Advanced Hero Slider</title>
+  
+  <!-- Bootstrap CSS helps with layout and responsiveness -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  
+  <!-- GSAP library makes complex animations super smooth -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      overflow-x: hidden;
+    }
+    
+    /* Main container holds the entire slider */
+    .hero-slider-container {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+      background: #000;
+    }
+    
+    /* Each slide takes full screen and stacks on top */
+    .hero-slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    /* Active slide becomes visible */
+    .hero-slide.active {
+      opacity: 1;
+      pointer-events: auto;
+      z-index: 10;
+    }
+    
+    /* Particle canvas sits behind everything */
+    .particle-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+    
+    /* Content wrapper centers text and keeps it above background */
+    .slide-content {
+      position: relative;
+      z-index: 5;
+      text-align: center;
+      padding: 0 20px;
+      max-width: 900px;
+    }
+    
+    /* Split screen effect divides slide into two sections */
+    .split-slide {
+      display: flex;
+      width: 100%;
+      height: 100%;
+    }
+    
+    .split-left, .split-right {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    /* Background image with parallax scrolling effect */
+    .parallax-image {
+      position: absolute;
+      top: -10%;
+      left: -10%;
+      width: 120%;
+      height: 120%;
+      background-size: cover;
+      background-position: center;
+      will-change: transform;
+    }
+    
+    /* Gradient overlay adds depth to backgrounds */
+    .gradient-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+    }
+    
+    /* Typography styles make text pop */
+    .hero-title {
+      font-size: 4.5rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 20px;
+      line-height: 1.1;
+      text-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    
+    .hero-subtitle {
+      font-size: 1.3rem;
+      color: rgba(255,255,255,0.9);
+      margin-bottom: 35px;
+      font-weight: 300;
+      letter-spacing: 1px;
+    }
+    
+    /* Button gets modern styling with hover effects */
+    .hero-btn {
+      display: inline-block;
+      padding: 18px 45px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+      text-decoration: none;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 1.1rem;
+      transition: all 0.4s ease;
+      box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .hero-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 20px 40px rgba(102, 126, 234, 0.6);
+      color: #fff;
+    }
+    
+    /* Glow effect appears behind button on hover */
+    .hero-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      transition: left 0.5s;
+    }
+    
+    .hero-btn:hover::before {
+      left: 100%;
+    }
+    
+    /* Navigation dots show which slide is active */
+    .slider-nav {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+      display: flex;
+      gap: 12px;
+    }
+    
+    .nav-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.4);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+    }
+    
+    .nav-dot:hover {
+      background: rgba(255,255,255,0.7);
+      transform: scale(1.2);
+    }
+    
+    .nav-dot.active {
+      background: #fff;
+      width: 35px;
+      border-radius: 10px;
+    }
+    
+    /* Arrow navigation lets users skip slides */
+    .slider-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 100;
+      background: rgba(255,255,255,0.1);
+      border: 2px solid rgba(255,255,255,0.3);
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+    
+    .slider-arrow:hover {
+      background: rgba(255,255,255,0.2);
+      transform: translateY(-50%) scale(1.1);
+    }
+    
+    .arrow-left {
+      left: 30px;
+    }
+    
+    .arrow-right {
+      right: 30px;
+    }
+    
+    .slider-arrow svg {
+      width: 24px;
+      height: 24px;
+      fill: #fff;
+    }
+    
+    /* Floating shapes add visual interest */
+    .floating-shape {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(20px);
+    }
+    
+    /* Responsive adjustments keep everything looking good on mobile */
+    @media (max-width: 768px) {
+      .hero-title {
+        font-size: 2.5rem;
+      }
+      
+      .hero-subtitle {
+        font-size: 1rem;
+      }
+      
+      .hero-btn {
+        padding: 14px 35px;
+        font-size: 1rem;
+      }
+      
+      .split-slide {
+        flex-direction: column;
+      }
+      
+      .slider-arrow {
+        width: 45px;
+        height: 45px;
+      }
+      
+      .arrow-left {
+        left: 15px;
+      }
+      
+      .arrow-right {
+        right: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Main slider container wraps everything -->
+<div class="hero-slider-container">
+  
+  <!-- Slide 1 with particle background and centered content -->
+  <div class="hero-slide active" data-slide="0">
+    <canvas class="particle-bg" id="particles1"></canvas>
+    <div class="gradient-overlay" style="background: linear-gradient(135deg, rgba(102,126,234,0.8) 0%, rgba(118,75,162,0.8) 100%);"></div>
+    
+    <!-- Floating decoration shapes move around slowly -->
+    <div class="floating-shape" style="width: 300px; height: 300px; top: 10%; left: 5%;"></div>
+    <div class="floating-shape" style="width: 200px; height: 200px; bottom: 15%; right: 10%;"></div>
+    
+    <div class="slide-content">
+      <h1 class="hero-title" data-animate="title">Create Amazing Experiences</h1>
+      <p class="hero-subtitle" data-animate="subtitle">Build stunning websites with cutting-edge design and smooth animations</p>
+      <a href="#" class="hero-btn" data-animate="button">Get Started Now</a>
+    </div>
+  </div>
+  
+  <!-- Slide 2 uses split screen layout -->
+  <div class="hero-slide" data-slide="1">
+    <div class="split-slide">
+      <div class="split-left">
+        <div class="parallax-image" style="background-image: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1200');"></div>
+        <div class="gradient-overlay" style="background: linear-gradient(90deg, rgba(255,107,107,0.9) 0%, rgba(255,168,1,0.9) 100%);"></div>
+      </div>
+      <div class="split-right" style="background: linear-gradient(135deg, #ff6b6b 0%, #ffa801 100%);">
+        <div class="slide-content">
+          <h1 class="hero-title" data-animate="title">Next Level Design</h1>
+          <p class="hero-subtitle" data-animate="subtitle">Push boundaries with revolutionary web experiences</p>
+          <a href="#" class="hero-btn" data-animate="button" style="background: linear-gradient(135deg, #000 0%, #434343 100%);">Explore More</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Slide 3 features parallax background image -->
+  <div class="hero-slide" data-slide="2">
+    <div class="parallax-image" style="background-image: url('https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1200');"></div>
+    <div class="gradient-overlay" style="background: linear-gradient(135deg, rgba(0,180,219,0.85) 0%, rgba(0,131,176,0.85) 100%);"></div>
+    <canvas class="particle-bg" id="particles3"></canvas>
+    
+    <div class="slide-content">
+      <h1 class="hero-title" data-animate="title">Transform Your Vision</h1>
+      <p class="hero-subtitle" data-animate="subtitle">Bring ideas to life with powerful modern technology</p>
+      <a href="#" class="hero-btn" data-animate="button">Start Your Journey</a>
+    </div>
+  </div>
+  
+  <!-- Navigation dots let users jump to specific slides -->
+  <div class="slider-nav">
+    <div class="nav-dot active" data-slide="0"></div>
+    <div class="nav-dot" data-slide="1"></div>
+    <div class="nav-dot" data-slide="2"></div>
+  </div>
+  
+  <!-- Arrow buttons for previous and next -->
+  <div class="slider-arrow arrow-left">
+    <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+  </div>
+  <div class="slider-arrow arrow-right">
+    <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+  </div>
+  
+</div>
+
+<!-- Bootstrap JS handles responsive features -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+// Particle animation creates dynamic background effects
+function createParticles(canvasId) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  
+  const particles = [];
+  const particleCount = 80;
+  
+  // Each particle gets random properties
+  class Particle {
+    constructor() {
+      this.x = Math.random() * canvas.width;
+      this.y = Math.random() * canvas.height;
+      this.size = Math.random() * 3 + 1;
+      this.speedX = Math.random() * 2 - 1;
+      this.speedY = Math.random() * 2 - 1;
+      this.opacity = Math.random() * 0.5 + 0.2;
+    }
+    
+    // Update position creates movement
+    update() {
+      this.x += this.speedX;
+      this.y += this.speedY;
+      
+      if (this.x > canvas.width) this.x = 0;
+      if (this.x < 0) this.x = canvas.width;
+      if (this.y > canvas.height) this.y = 0;
+      if (this.y < 0) this.y = canvas.height;
+    }
+    
+    // Draw method renders each particle
+    draw() {
+      ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+  
+  // Initialize all particles at start
+  for (let i = 0; i < particleCount; i++) {
+    particles.push(new Particle());
+  }
+  
+  // Animation loop keeps particles moving
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    particles.forEach(particle => {
+      particle.update();
+      particle.draw();
+    });
+    
+    // Connect nearby particles with lines
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        if (distance < 120) {
+          ctx.strokeStyle = `rgba(255, 255, 255, ${0.15 * (1 - distance / 120)})`;
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.stroke();
+        }
+      }
+    }
+    
+    requestAnimationFrame(animate);
+  }
+  
+  animate();
+  
+  // Resize handler keeps canvas sized correctly
+  window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  });
+}
+
+// Initialize particles for slides that have them
+createParticles('particles1');
+createParticles('particles3');
+
+// Slider logic handles transitions between slides
+const slides = document.querySelectorAll('.hero-slide');
+const navDots = document.querySelectorAll('.nav-dot');
+const arrowLeft = document.querySelector('.arrow-left');
+const arrowRight = document.querySelector('.arrow-right');
+let currentSlide = 0;
+let isAnimating = false;
+const slideCount = slides.length;
+
+// Function changes active slide with smooth animation
+function goToSlide(index) {
+  if (isAnimating || index === currentSlide) return;
+  isAnimating = true;
+  
+  const currentSlideEl = slides[currentSlide];
+  const nextSlideEl = slides[index];
+  
+  // Animate out current slide
+  gsap.to(currentSlideEl, {
+    opacity: 0,
+    scale: 0.95,
+    duration: 0.6,
+    ease: 'power2.inOut',
+    onComplete: () => {
+      currentSlideEl.classList.remove('active');
+    }
+  });
+  
+  // Animate in next slide
+  nextSlideEl.classList.add('active');
+  gsap.fromTo(nextSlideEl, 
+    { opacity: 0, scale: 1.05 },
+    { 
+      opacity: 1, 
+      scale: 1, 
+      duration: 0.6,
+      ease: 'power2.inOut',
+      onComplete: () => {
+        isAnimating = false;
+      }
+    }
+  );
+  
+  // Animate slide content with stagger effect
+  const animateElements = nextSlideEl.querySelectorAll('[data-animate]');
+  gsap.fromTo(animateElements,
+    { y: 60, opacity: 0 },
+    { 
+      y: 0, 
+      opacity: 1, 
+      duration: 0.8,
+      stagger: 0.15,
+      ease: 'power3.out',
+      delay: 0.3
+    }
+  );
+  
+  // Update navigation dots
+  navDots[currentSlide].classList.remove('active');
+  navDots[index].classList.add('active');
+  
+  currentSlide = index;
+}
+
+// Click handlers for navigation dots
+navDots.forEach(dot => {
+  dot.addEventListener('click', () => {
+    goToSlide(parseInt(dot.dataset.slide));
+  });
+});
+
+// Arrow navigation moves to previous or next slide
+arrowLeft.addEventListener('click', () => {
+  const prevSlide = (currentSlide - 1 + slideCount) % slideCount;
+  goToSlide(prevSlide);
+});
+
+arrowRight.addEventListener('click', () => {
+  const nextSlide = (currentSlide + 1) % slideCount;
+  goToSlide(nextSlide);
+});
+
+// Keyboard navigation adds accessibility
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowLeft') {
+    arrowLeft.click();
+  } else if (e.key === 'ArrowRight') {
+    arrowRight.click();
+  }
+});
+
+// Autoplay advances slides automatically
+let autoplayInterval = setInterval(() => {
+  arrowRight.click();
+}, 6000);
+
+// Pause autoplay when user interacts
+document.querySelector('.hero-slider-container').addEventListener('mouseenter', () => {
+  clearInterval(autoplayInterval);
+});
+
+document.querySelector('.hero-slider-container').addEventListener('mouseleave', () => {
+  autoplayInterval = setInterval(() => {
+    arrowRight.click();
+  }, 6000);
+});
+
+// Parallax effect moves background images on mouse move
+document.addEventListener('mousemove', (e) => {
+  const slides = document.querySelectorAll('.hero-slide.active');
+  slides.forEach(slide => {
+    const parallaxImages = slide.querySelectorAll('.parallax-image');
+    parallaxImages.forEach(img => {
+      const moveX = (e.clientX - window.innerWidth / 2) * 0.01;
+      const moveY = (e.clientY - window.innerHeight / 2) * 0.01;
+      gsap.to(img, {
+        x: moveX,
+        y: moveY,
+        duration: 1,
+        ease: 'power2.out'
+      });
+    });
+  });
+});
+
+// Floating shapes animate with GSAP timeline
+document.querySelectorAll('.floating-shape').forEach((shape, index) => {
+  gsap.to(shape, {
+    y: '+=30',
+    x: '+=20',
+    rotation: 360,
+    duration: 8 + index * 2,
+    repeat: -1,
+    yoyo: true,
+    ease: 'sine.inOut'
+  });
+});
+
+// Initial animation when page loads
+window.addEventListener('load', () => {
+  const firstSlide = document.querySelector('.hero-slide.active');
+  const animateElements = firstSlide.querySelectorAll('[data-animate]');
+  
+  gsap.fromTo(animateElements,
+    { y: 60, opacity: 0 },
+    { 
+      y: 0, 
+      opacity: 1, 
+      duration: 1,
+      stagger: 0.2,
+      ease: 'power3.out',
+      delay: 0.5
+    }
+  );
+});
+</script>
+
+</body>
+</html>
