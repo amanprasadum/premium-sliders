@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ultra Modern Hero Slider</title>
+  
+  <!-- Bootstrap helps with grid system and mobile responsiveness -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  
+  <!-- Google Fonts add premium typography -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+  
+  <!-- GSAP creates smooth professional animations -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      overflow-x: hidden;
+      background: #000;
+    }
+    
+    /* Main container sets up the viewport */
+    .hero-slider-wrapper {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+      perspective: 1500px;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+    }
+    
+    /* Slide container holds all slides in 3D space */
+    .slider-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+    }
+    
+    /* Each slide gets positioned in 3D circle */
+    .hero-slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      transform-style: preserve-3d;
+      backface-visibility: hidden;
+    }
+    
+    /* Active slide becomes visible with full opacity */
+    .hero-slide.active {
+      opacity: 1;
+      z-index: 10;
+    }
+    
+    /* Background layer creates depth with parallax */
+    .slide-bg-layer {
+      position: absolute;
+      top: -15%;
+      left: -15%;
+      width: 130%;
+      height: 130%;
+      background-size: cover;
+      background-position: center;
+      filter: brightness(0.6);
+      transition: transform 0.3s ease-out;
+    }
+    
+    /* Morphing overlay adds color blend effects */
+    .morph-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      mix-blend-mode: multiply;
+      opacity: 0.7;
+      transition: all 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    /* Particle canvas sits in middle layer */
+    .particles-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 3;
+      pointer-events: none;
+    }
+    
+    /* Glass morphism effect creates modern frosted look */
+    .glass-card {
+      position: relative;
+      z-index: 5;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(20px);
+      border-radius: 30px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 60px 50px;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
+      transform: translateZ(100px);
+    }
+    
+    /* Content section centers everything nicely */
+    .slide-content {
+      position: relative;
+      z-index: 5;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 15px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+    }
+    
+    /* Split layout divides screen for dual content */
+    .content-split {
+      display: flex;
+      align-items: center;
+      gap: 80px;
+      width: 100%;
+    }
+    
+    .content-left, .content-right {
+      flex: 1;
+    }
+    
+    /* Badge adds small detail above heading */
+    .slide-badge {
+      display: inline-block;
+      padding: 10px 25px;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      border-radius: 50px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #fff;
+      margin-bottom: 25px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    /* Main heading uses massive bold typography */
+    .slide-title {
+      font-size: 5rem;
+      font-weight: 900;
+      color: #fff;
+      line-height: 1.1;
+      margin-bottom: 30px;
+      text-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.7) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    /* Subtitle provides supporting text */
+    .slide-subtitle {
+      font-size: 1.25rem;
+      color: rgba(255, 255, 255, 0.85);
+      line-height: 1.8;
+      margin-bottom: 40px;
+      font-weight: 300;
+    }
+    
+    /* Button group holds multiple action buttons */
+    .btn-group-custom {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    
+    /* Primary button has gradient and glow */
+    .btn-hero-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 18px 40px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+      text-decoration: none;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 1.05rem;
+      transition: all 0.4s ease;
+      box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5);
+      position: relative;
+      overflow: hidden;
+      border: none;
+    }
+    
+    .btn-hero-primary:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 20px 50px rgba(102, 126, 234, 0.7);
+      color: #fff;
+    }
+    
+    .btn-hero-primary::after {
+      content: '→';
+      margin-left: 5px;
+      transition: transform 0.3s ease;
+    }
+    
+    .btn-hero-primary:hover::after {
+      transform: translateX(5px);
+    }
+    
+    /* Secondary button has outline style */
+    .btn-hero-secondary {
+      display: inline-flex;
+      align-items: center;
+      padding: 18px 40px;
+      background: transparent;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 1.05rem;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(10px);
+      transition: all 0.4s ease;
+    }
+    
+    .btn-hero-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.6);
+      transform: translateY(-3px);
+      color: #fff;
+    }
+    
+    /* Featured image box shows product or visual */
+    .featured-image-box {
+      position: relative;
+      width: 100%;
+      height: 500px;
+      border-radius: 30px;
+      overflow: hidden;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+      transform: perspective(1000px) rotateY(-5deg);
+      transition: transform 0.5s ease;
+    }
+    
+    .featured-image-box:hover {
+      transform: perspective(1000px) rotateY(0deg) scale(1.02);
+    }
+    
+    .featured-image-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    /* Stats section displays metrics beautifully */
+    .stats-row {
+      display: flex;
+      gap: 40px;
+      margin-top: 50px;
+      flex-wrap: wrap;
+    }
+    
+    .stat-item {
+      text-align: center;
+    }
+    
+    .stat-number {
+      font-size: 3rem;
+      font-weight: 900;
+      color: #fff;
+      line-height: 1;
+      margin-bottom: 10px;
+    }
+    
+    .stat-label {
+      font-size: 0.95rem;
+      color: rgba(255, 255, 255, 0.7);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    /* Navigation dots show progress through slides */
+    .slider-navigation {
+      position: absolute;
+      bottom: 50px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+    
+    .nav-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      cursor: pointer;
+      transition: all 0.4s ease;
+      position: relative;
+    }
+    
+    .nav-dot:hover {
+      background: rgba(255, 255, 255, 0.6);
+      transform: scale(1.3);
+    }
+    
+    .nav-dot.active {
+      background: #fff;
+      width: 50px;
+      border-radius: 10px;
+    }
+    
+    .nav-dot.active::after {
+      content: '';
+      position: absolute;
+      top: -5px;
+      left: -5px;
+      right: -5px;
+      bottom: -5px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 15px;
+    }
+    
+    /* Arrow controls for manual navigation */
+    .slider-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 100;
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(15px);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.4s ease;
+    }
+    
+    .slider-arrow:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-50%) scale(1.1);
+      border-color: rgba(255, 255, 255, 0.4);
+    }
+    
+    .slider-arrow.arrow-prev {
+      left: 40px;
+    }
+    
+    .slider-arrow.arrow-next {
+      right: 40px;
+    }
+    
+    .slider-arrow svg {
+      width: 28px;
+      height: 28px;
+      fill: #fff;
+    }
+    
+    /* Progress bar shows slide timer */
+    .slide-progress {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 0%;
+      height: 4px;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+      z-index: 200;
+      transition: width 0.1s linear;
+    }
+    
+    /* Decorative floating elements add depth */
+    .float-element {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(30px);
+      pointer-events: none;
+    }
+    
+    /* Responsive adjustments keep mobile looking great */
+    @media (max-width: 1200px) {
+      .slide-title {
+        font-size: 3.5rem;
+      }
+      
+      .content-split {
+        gap: 50px;
+      }
+      
+      .featured-image-box {
+        height: 400px;
+      }
+    }
+    
+    @media (max-width: 992px) {
+      .content-split {
+        flex-direction: column;
+        gap: 40px;
+      }
+      
+      .slide-title {
+        font-size: 3rem;
+      }
+      
+      .glass-card {
+        padding: 40px 30px;
+      }
+      
+      .featured-image-box {
+        height: 350px;
+        transform: perspective(1000px) rotateY(0deg);
+      }
+      
+      .stats-row {
+        justify-content: center;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .slide-title {
+        font-size: 2.5rem;
+      }
+      
+      .slide-subtitle {
+        font-size: 1.1rem;
+      }
+      
+      .btn-hero-primary, .btn-hero-secondary {
+        padding: 15px 30px;
+        font-size: 0.95rem;
+      }
+      
+      .btn-group-custom {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .slider-arrow {
+        width: 55px;
+        height: 55px;
+      }
+      
+      .slider-arrow.arrow-prev {
+        left: 20px;
+      }
+      
+      .slider-arrow.arrow-next {
+        right: 20px;
+      }
+      
+      .slider-navigation {
+        bottom: 30px;
+      }
+      
+      .stat-number {
+        font-size: 2.5rem;
+      }
+      
+      .featured-image-box {
+        height: 280px;
+      }
+    }
+    
+    @media (max-width: 576px) {
+      .slide-title {
+        font-size: 2rem;
+      }
+      
+      .glass-card {
+        padding: 30px 20px;
+        border-radius: 20px;
+      }
+      
+      .slider-arrow {
+        width: 45px;
+        height: 45px;
+      }
+      
+      .slider-arrow svg {
+        width: 20px;
+        height: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Progress bar shows autoplay timing -->
+<div class="slide-progress" id="slideProgress"></div>
+
+<!-- Main wrapper contains entire slider -->
+<div class="hero-slider-wrapper">
+  
+  <!-- Floating decorative elements move around -->
+  <div class="float-element" style="width: 400px; height: 400px; top: -10%; left: -5%;"></div>
+  <div class="float-element" style="width: 300px; height: 300px; bottom: -5%; right: -5%;"></div>
+  <div class="float-element" style="width: 250px; height: 250px; top: 40%; right: 10%;"></div>
+  
+  <div class="slider-container">
+    
+    <!-- Slide 1 showcases creative agency style -->
+    <div class="hero-slide active" data-slide="0">
+      <div class="slide-bg-layer" style="background-image: url('https://picsum.photos/id/1015/1920/1080');"></div>
+      <div class="morph-overlay" style="background: linear-gradient(135deg, rgba(102,126,234,0.85) 0%, rgba(118,75,162,0.85) 100%);"></div>
+      <canvas class="particles-layer" id="particles1"></canvas>
+      
+      <div class="slide-content">
+        <div class="container">
+          <div class="row align-items-center">
+            <div class="col-lg-7">
+              <div data-animate="fade-up">
+                <span class="slide-badge">Innovation First</span>
+                <h1 class="slide-title">Design That Moves Forward</h1>
+                <p class="slide-subtitle">Create breathtaking digital experiences with cutting-edge technology and stunning visual design that captivates your audience.</p>
+                <div class="btn-group-custom">
+                  <a href="#" class="btn-hero-primary">Start Your Project</a>
+                  <a href="#" class="btn-hero-secondary">Watch Demo</a>
+                </div>
+                
+                <div class="stats-row">
+                  <div class="stat-item">
+                    <div class="stat-number">500+</div>
+                    <div class="stat-label">Projects Done</div>
+                  </div>
+                  <div class="stat-item">
+                    <div class="stat-number">98%</div>
+                    <div class="stat-label">Happy Clients</div>
+                  </div>
+                  <div class="stat-item">
+                    <div class="stat-number">15+</div>
+                    <div class="stat-label">Years Experience</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Slide 2 features product showcase layout -->
+    <div class="hero-slide" data-slide="1">
+      <div class="slide-bg-layer" style="background-image: url('https://picsum.photos/id/1018/1920/1080');"></div>
+      <div class="morph-overlay" style="background: linear-gradient(135deg, rgba(255,107,107,0.9) 0%, rgba(255,168,1,0.9) 100%);"></div>
+      <canvas class="particles-layer" id="particles2"></canvas>
+      
+      <div class="slide-content">
+        <div class="container">
+          <div class="content-split">
+            <div class="content-left" data-animate="fade-right">
+              <span class="slide-badge">Next Generation</span>
+              <h1 class="slide-title">Build Better Products</h1>
+              <p class="slide-subtitle">Transform your vision into reality with powerful tools and seamless workflows designed for modern creators.</p>
+              <div class="btn-group-custom">
+                <a href="#" class="btn-hero-primary">Get Started Free</a>
+                <a href="#" class="btn-hero-secondary">See Pricing</a>
+              </div>
+            </div>
+            <div class="content-right" data-animate="fade-left">
+              <div class="featured-image-box">
+                <img src="https://picsum.photos/id/180/800/600" alt="Featured Product">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Slide 3 presents glass morphism card style -->
+    <div class="hero-slide" data-slide="2">
+      <div class="slide-bg-layer" style="background-image: url('https://picsum.photos/id/1019/1920/1080');"></div>
+      <div class="morph-overlay" style="background: linear-gradient(135deg, rgba(0,180,219,0.88) 0%, rgba(0,131,176,0.88) 100%);"></div>
+      <canvas class="particles-layer" id="particles3"></canvas>
+      
+      <div class="slide-content">
+        <div class="container">
+          <div class="row justify-content-center">
+            <div class="col-lg-8">
+              <div class="glass-card text-center" data-animate="zoom-in">
+                <span class="slide-badge">Premium Quality</span>
+                <h1 class="slide-title">Elevate Your Brand</h1>
+                <p class="slide-subtitle">Stand out from the competition with exceptional design, powerful features, and unmatched performance that drives results.</p>
+                <div class="btn-group-custom justify-content-center">
+                  <a href="#" class="btn-hero-primary">Join Waitlist</a>
+                  <a href="#" class="btn-hero-secondary">Learn More</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Slide 4 shows split image composition -->
+    <div class="hero-slide" data-slide="3">
+      <div class="slide-bg-layer" style="background-image: url('https://picsum.photos/id/1036/1920/1080');"></div>
+      <div class="morph-overlay" style="background: linear-gradient(135deg, rgba(108,99,255,0.9) 0%, rgba(220,31,255,0.9) 100%);"></div>
+      <canvas class="particles-layer" id="particles4"></canvas>
+      
+      <div class="slide-content">
+        <div class="container">
+          <div class="content-split">
+            <div class="content-left" data-animate="fade-up">
+              <div class="featured-image-box">
+                <img src="https://picsum.photos/id/201/800/600" alt="Technology">
+              </div>
+            </div>
+            <div class="content-right" data-animate="fade-up-delay">
+              <span class="slide-badge">Technology Driven</span>
+              <h1 class="slide-title">Power Your Growth</h1>
+              <p class="slide-subtitle">Scale your business with intelligent solutions that adapt and evolve with your needs for sustainable success.</p>
+              <div class="btn-group-custom">
+                <a href="#" class="btn-hero-primary">Request Demo</a>
+                <a href="#" class="btn-hero-secondary">Contact Sales</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+  
+  <!-- Navigation controls let users move through slides -->
+  <div class="slider-navigation">
+    <div class="nav-dot active" data-slide="0"></div>
+    <div class="nav-dot" data-slide="1"></div>
+    <div class="nav-dot" data-slide="2"></div>
+    <div class="nav-dot" data-slide="3"></div>
+  </div>
+  
+  <!-- Arrow buttons provide manual control -->
+  <div class="slider-arrow arrow-prev">
+    <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+  </div>
+  <div class="slider-arrow arrow-next">
+    <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+  </div>
+  
+</div>
+
+<!-- Bootstrap JS handles responsive grid behavior -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+// Particle system creates dynamic background animation
+function initParticles(canvasId, particleColor = 'rgba(255,255,255,0.8)') {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+  
+  // Resize canvas to match screen size
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resizeCanvas();
+  
+  // Particle class defines behavior and appearance
+  class Particle {
+    constructor() {
+      this.x = Math.random() * canvas.width;
+      this.y = Math.random() * canvas.height;
+      this.size = Math.random() * 4 + 1;
+      this.speedX = Math.random() * 3 - 1.5;
+      this.speedY = Math.random() * 3 - 1.5;
+      this.opacity = Math.random() * 0.6 + 0.2;
+    }
+    
+    // Update changes position each frame
+    update() {
+      this.x += this.speedX;
+      this.y += this.speedY;
+      
+      // Wrap particles around screen edges
+      if (this.x > canvas.width) this.x = 0;
+      if (this.x < 0) this.x = canvas.width;
+      if (this.y > canvas.height) this.y = 0;
+      if (this.y < 0) this.y = canvas.height;
+    }
+    
+    // Draw renders particle on canvas
+    draw() {
+      ctx.fillStyle = particleColor.replace('0.8', this.opacity);
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+  
+  // Create initial particle set
+  function createParticles() {
+    const particleCount = window.innerWidth < 768 ? 50 : 100;
+    particles = [];
+    for (let i = 0; i < particleCount; i++) {
+      particles.push(new Particle());
+    }
+  }
+  createParticles();
+  
+  // Animation loop runs continuously
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Update and draw each particle
+    particles.forEach(particle => {
+      particle.update();
+      particle.draw();
+    });
+    
+    // Draw lines between nearby particles
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        if (distance < 150) {
+          ctx.strokeStyle = particleColor.replace('0.8', (0.2 * (1 - distance / 150)));
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.stroke();
+        }
+      }
+    }
+    
+    requestAnimationFrame(animate);
+  }
+  animate();
+  
+  // Handle window resize events
+  window.addEventListener('resize', () => {
+    resizeCanvas();
+    createParticles();
+  });
+}
+
+// Initialize particles for each slide
+initParticles('particles1');
+initParticles('particles2');
+initParticles('particles3');
+initParticles('particles4');
+
+// Slider control system manages transitions
+const slides = document.querySelectorAll('.hero-slide');
+const navDots = document.querySelectorAll('.nav-dot');
+const arrowPrev = document.querySelector('.arrow-prev');
+const arrowNext = document.querySelector('.arrow-next');
+const progressBar = document.getElementById('slideProgress');
+
+let currentSlide = 0;
+let isAnimating = false;
+let autoplayTimer;
+let progressInterval;
+const slideCount = slides.length;
+const autoplayDuration = 7000;
+
+// Function handles slide transition animations
+function changeSlide(targetIndex) {
+  if (isAnimating || targetIndex === currentSlide) return;
+  isAnimating = true;
+  
+  const currentSlideEl = slides[currentSlide];
+  const targetSlideEl = slides[targetIndex];
+  
+  // Determine transition direction
+  const direction = targetIndex > currentSlide ? 1 : -1;
+  
+  // Animate out current slide with 3D effect
+  gsap.to(currentSlideEl, {
+    opacity: 0,
+    x: -100 * direction,
+    rotationY: -15 * direction,
+    scale: 0.9,
+    duration: 0.8,
+    ease: 'power3.inOut',
+    onComplete: () => {
+      currentSlideEl.classList.remove('active');
+    }
+  });
+  
+  // Animate in target slide
+  targetSlideEl.classList.add('active');
+  gsap.fromTo(targetSlideEl,
+    {
+      opacity: 0,
+      x: 100 * direction,
+      rotationY: 15 * direction,
+      scale: 0.9
+    },
+    {
+      opacity: 1,
+      x: 0,
+      rotationY: 0,
+      scale: 1,
+      duration: 0.8,
+      ease: 'power3.inOut',
+      onComplete: () => {
+        isAnimating = false;
+      }
+    }
+  );
+  
+  // Animate content elements with stagger
+  const contentElements = targetSlideEl.querySelectorAll('[data-animate]');
+  gsap.fromTo(contentElements,
+    {
+      y: 80,
+      opacity: 0,
+      rotationX: -20
+    },
+    {
+      y: 0,
+      opacity: 1,
+      rotationX: 0,
+      duration: 1,
+      stagger: 0.15,
+      ease: 'power3.out',
+      delay: 0.4
+    }
+  );
+  
+  // Update navigation dots
+  navDots[currentSlide].classList.remove('active');
+  navDots[targetIndex].classList.add('active');
+  
+  currentSlide = targetIndex;
+  
+  // Reset autoplay and progress
+  resetAutoplay();
+}
+
+// Progress bar shows visual countdown
+function updateProgress() {
+  let progress = 0;
+  const step = 100 / (autoplayDuration / 50);
+  
+  clearInterval(progressInterval);
+  progressInterval = setInterval(() => {
+    progress += step;
+    progressBar.style.width = progress + '%';
+    
+    if (progress >= 100) {
+      clearInterval(progressInterval);
+    }
+  }, 50);
+}
+
+// Autoplay advances slides automatically
+function startAutoplay() {
+  clearTimeout(autoplayTimer);
+  updateProgress();
+  
+  autoplayTimer = setTimeout(() => {
+    const nextIndex = (currentSlide + 1) % slideCount;
+    changeSlide(nextIndex);
+  }, autoplayDuration);
+}
+
+// Reset autoplay when user interacts
+function resetAutoplay() {
+  progressBar.style.width = '0%';
+  startAutoplay();
+}
+
+// Click handlers for navigation dots
+navDots.forEach(dot => {
+  dot.addEventListener('click', () => {
+    changeSlide(parseInt(dot.dataset.slide));
+  });
+});
+
+// Arrow navigation moves between slides
+arrowPrev.addEventListener('click', () => {
+  const prevIndex = (currentSlide - 1 + slideCount) % slideCount;
+  changeSlide(prevIndex);
+});
+
+arrowNext.addEventListener('click', () => {
+  const nextIndex = (currentSlide + 1) % slideCount;
+  changeSlide(nextIndex);
+});
+
+// Keyboard shortcuts improve accessibility
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowLeft') {
+    arrowPrev.click();
+  } else if (e.key === 'ArrowRight') {
+    arrowNext.click();
+  }
+});
+
+// Mouse parallax creates depth effect
+let mouseX = 0;
+let mouseY = 0;
+
+document.addEventListener('mousemove', (e) => {
+  mouseX = (e.clientX - window.innerWidth / 2) / window.innerWidth;
+  mouseY = (e.clientY - window.innerHeight / 2) / window.innerHeight;
+  
+  // Apply parallax to background layers
+  const activeBg = document.querySelector('.hero-slide.active .slide-bg-layer');
+  if (activeBg) {
+    gsap.to(activeBg, {
+      x: mouseX * 30,
+      y: mouseY * 30,
+      duration: 0.5,
+      ease: 'power2.out'
+    });
+  }
+});
+
+// Floating elements animate continuously
+document.querySelectorAll('.float-element').forEach((element, index) => {
+  gsap.to(element, {
+    y: '+=60',
+    x: '+=40',
+    rotation: 360,
+    duration: 15 + index * 3,
+    repeat: -1,
+    yoyo: true,
+    ease: 'sine.inOut',
+    delay: index * 0.5
+  });
+});
+
+// Initial page load animation
+window.addEventListener('load', () => {
+  const firstSlide = slides[0];
+  const contentElements = firstSlide.querySelectorAll('[data-animate]');
+  
+  gsap.fromTo(contentElements,
+    {
+      y: 100,
+      opacity: 0,
+      rotationX: -20
+    },
+    {
+      y: 0,
+      opacity: 1,
+      rotationX: 0,
+      duration: 1.2,
+      stagger: 0.2,
+      ease: 'power3.out',
+      delay: 0.3
+    }
+  );
+  
+  // Start autoplay after initial animation
+  startAutoplay();
+});
+
+// Pause autoplay when user leaves page
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    clearTimeout(autoplayTimer);
+    clearInterval(progressInterval);
+  } else {
+    resetAutoplay();
+  }
+});
+</script>
+
+</body>
+</html>
