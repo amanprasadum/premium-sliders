@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  overflow-x: hidden;
+}
+
+.hero-slider {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  background: #0a0a0a;
+}
+
+.slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1), visibility 1.2s;
+}
+
+.slide.active {
+  opacity: 1;
+  visibility: visible;
+  z-index: 1;
+}
+
+.slide-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  transform: scale(1.1);
+}
+
+.slide.active .slide-bg {
+  animation: modernZoom 10s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes modernZoom {
+  0% {
+    transform: scale(1.1) translateX(0);
+  }
+  100% {
+    transform: scale(1.25) translateX(-20px);
+  }
+}
+
+.slide-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.6) 100%);
+  z-index: 2;
+}
+
+/* Glassmorphism Card */
+.slide-content {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+  padding: 0 8%;
+  max-width: 700px;
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(25px) saturate(180%);
+  -webkit-backdrop-filter: blur(25px) saturate(180%);
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  padding: 50px 45px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
+  transform: translateX(-100px);
+  opacity: 0;
+}
+
+.slide.active .glass-card {
+  animation: slideInGlass 1s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
+}
+
+@keyframes slideInGlass {
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.slide-label {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  color: #fff;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 8px 20px;
+  border-radius: 50px;
+  margin-bottom: 25px;
+  width: fit-content;
+}
+
+.slide-content h1 {
+  font-size: 3.8rem;
+  font-weight: 900;
+  line-height: 1.1;
+  margin-bottom: 20px;
+  color: #fff;
+  letter-spacing: -2px;
+}
+
+.slide-content h1 .highlight {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.slide-content p {
+  font-size: 1.15rem;
+  font-weight: 300;
+  color: rgba(255,255,255,0.9);
+  margin-bottom: 35px;
+  line-height: 1.7;
+}
+
+.slide-actions {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.slide-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 35px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  text-decoration: none;
+  border-radius: 12px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.slide-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+  transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: -1;
+}
+
+.slide-btn:hover::before {
+  left: 0;
+}
+
+.slide-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+}
+
+.slide-btn-secondary {
+  padding: 16px 35px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  background: transparent;
+  border: 2px solid rgba(255,255,255,0.3);
+  text-decoration: none;
+  border-radius: 12px;
+  transition: all 0.4s ease;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+}
+
+.slide-btn-secondary:hover {
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.6);
+  transform: translateY(-3px);
+}
+
+/* Navigation Arrows */
+.slider-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 65px;
+  height: 65px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.slider-arrow:hover {
+  background: rgba(102, 126, 234, 0.3);
+  border-color: rgba(102, 126, 234, 0.6);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.arrow-left {
+  left: 40px;
+}
+
+.arrow-right {
+  right: 40px;
+}
+
+.slider-arrow svg {
+  width: 28px;
+  height: 28px;
+  fill: #fff;
+}
+
+/* Modern Progress Bar Navigation */
+.slider-progress-nav {
+  position: absolute;
+  bottom: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 20px;
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  padding: 15px 30px;
+  border-radius: 50px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.progress-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.progress-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 1px;
+  transition: color 0.3s ease;
+}
+
+.progress-bar {
+  width: 60px;
+  height: 3px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  border-radius: 10px;
+  transition: width 0.3s ease;
+}
+
+.progress-item.active .progress-label {
+  color: #fff;
+}
+
+.progress-item.active .progress-fill {
+  width: 100%;
+  animation: progressFill 5s linear;
+}
+
+@keyframes progressFill {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+
+/* Slide Counter */
+.slide-counter {
+  position: absolute;
+  top: 40px;
+  right: 60px;
+  z-index: 10;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+  padding: 12px 25px;
+  border-radius: 50px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.slide-counter .current {
+  font-size: 2rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .slide-content h1 {
+    font-size: 3rem;
+  }
+  
+  .glass-card {
+    padding: 40px 35px;
+  }
+  
+  .slider-arrow {
+    width: 55px;
+    height: 55px;
+  }
+  
+  .arrow-left {
+    left: 25px;
+  }
+  
+  .arrow-right {
+    right: 25px;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-slider {
+    height: 80vh;
+  }
+
+  .slide-content {
+    padding: 0 5%;
+  }
+
+  .glass-card {
+    padding: 35px 25px;
+  }
+
+  .slide-content h1 {
+    font-size: 2.2rem;
+  }
+
+  .slide-content p {
+    font-size: 1rem;
+  }
+
+  .slide-actions {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .slide-btn, .slide-btn-secondary {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .slider-arrow {
+    width: 45px;
+    height: 45px;
+  }
+
+  .arrow-left {
+    left: 15px;
+  }
+
+  .arrow-right {
+    right: 15px;
+  }
+
+  .slider-progress-nav {
+    gap: 12px;
+    padding: 12px 20px;
+  }
+
+  .progress-bar {
+    width: 45px;
+  }
+
+  .slide-counter {
+    top: 20px;
+    right: 20px;
+    font-size: 0.9rem;
+    padding: 8px 18px;
+  }
+
+  .slide-counter .current {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .slide-content h1 {
+    font-size: 1.8rem;
+  }
+
+  .slide-label {
+    font-size: 0.65rem;
+    padding: 6px 15px;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="hero-slider">
+  <!-- Slide 1 -->
+  <div class="slide active">
+    <div class="slide-bg" style="background-image: url('https://images.unsplash.com/photo-1519810755548-39cd217da494?w=1920');"></div>
+    <div class="slide-overlay"></div>
+    <div class="slide-content">
+      <div class="glass-card">
+        <span class="slide-label">New Collection</span>
+        <h1>Premium <span class="highlight">Cotton</span> Fabrics</h1>
+        <p>Experience luxury with our 100% pure cotton collection. Soft, breathable, and perfect for all seasons.</p>
+        <div class="slide-actions">
+          <a href="#" class="slide-btn">Explore Now</a>
+          <a href="#" class="slide-btn-secondary">View Catalog</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 2 -->
+  <div class="slide">
+    <div class="slide-bg" style="background-image: url('https://images.unsplash.com/photo-1558769132-cb1aea3c8dd5?w=1920');"></div>
+    <div class="slide-overlay"></div>
+    <div class="slide-content">
+      <div class="glass-card">
+        <span class="slide-label">Luxury Line</span>
+        <h1>Silk & <span class="highlight">Satin</span> Elegance</h1>
+        <p>Discover our premium silk collection crafted for sophistication. Perfect for special occasions and high-end fashion.</p>
+        <div class="slide-actions">
+          <a href="#" class="slide-btn">Shop Collection</a>
+          <a href="#" class="slide-btn-secondary">Learn More</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 3 -->
+  <div class="slide">
+    <div class="slide-bg" style="background-image: url('https://images.unsplash.com/photo-1604328698692-f76ea9498e76?w=1920');"></div>
+    <div class="slide-overlay"></div>
+    <div class="slide-content">
+      <div class="glass-card">
+        <span class="slide-label">Trending Now</span>
+        <h1>Designer <span class="highlight">Patterns</span></h1>
+        <p>Stay ahead of fashion trends with our curated designer patterns. Modern aesthetics meet traditional craftsmanship.</p>
+        <div class="slide-actions">
+          <a href="#" class="slide-btn">View Designs</a>
+          <a href="#" class="slide-btn-secondary">Get Samples</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 4 -->
+  <div class="slide">
+    <div class="slide-bg" style="background-image: url('https://images.unsplash.com/photo-1596122863954-d39fb48f45b2?w=1920');"></div>
+    <div class="slide-overlay"></div>
+    <div class="slide-content">
+      <div class="glass-card">
+        <span class="slide-label">Wholesale</span>
+        <h1>Bulk <span class="highlight">Solutions</span></h1>
+        <p>Competitive wholesale pricing for retailers and designers. Premium quality fabrics at unbeatable rates.</p>
+        <div class="slide-actions">
+          <a href="#" class="slide-btn">Get Quote</a>
+          <a href="#" class="slide-btn-secondary">Contact Us</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Arrow Navigation -->
+  <div class="slider-arrow arrow-left" onclick="changeSlide(-1)">
+    <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+  </div>
+  <div class="slider-arrow arrow-right" onclick="changeSlide(1)">
+    <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+  </div>
+
+  <!-- Modern Progress Navigation -->
+  <div class="slider-progress-nav">
+    <div class="progress-item active" onclick="goToSlide(0)">
+      <span class="progress-label">Cotton</span>
+      <div class="progress-bar">
+        <div class="progress-fill"></div>
+      </div>
+    </div>
+    <div class="progress-item" onclick="goToSlide(1)">
+      <span class="progress-label">Silk</span>
+      <div class="progress-bar">
+        <div class="progress-fill"></div>
+      </div>
+    </div>
+    <div class="progress-item" onclick="goToSlide(2)">
+      <span class="progress-label">Patterns</span>
+      <div class="progress-bar">
+        <div class="progress-fill"></div>
+      </div>
+    </div>
+    <div class="progress-item" onclick="goToSlide(3)">
+      <span class="progress-label">Wholesale</span>
+      <div class="progress-bar">
+        <div class="progress-fill"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide Counter -->
+  <div class="slide-counter">
+    <span class="current">01</span> / 04
+  </div>
+</div>
+
+<script>
+let currentSlide = 0;
+const slides = document.querySelectorAll('.slide');
+const progressItems = document.querySelectorAll('.progress-item');
+const slideCounter = document.querySelector('.slide-counter .current');
+let autoSlideInterval;
+
+function showSlide(index) {
+  slides.forEach((slide) => {
+    slide.classList.remove('active');
+  });
+  
+  progressItems.forEach((item) => {
+    item.classList.remove('active');
+  });
+  
+  currentSlide = (index + slides.length) % slides.length;
+  slides[currentSlide].classList.add('active');
+  progressItems[currentSlide].classList.add('active');
+  
+  slideCounter.textContent = String(currentSlide + 1).padStart(2, '0');
+}
+
+function changeSlide(direction) {
+  showSlide(currentSlide + direction);
+  resetAutoSlide();
+}
+
+function goToSlide(index) {
+  showSlide(index);
+  resetAutoSlide();
+}
+
+function autoSlide() {
+  autoSlideInterval = setInterval(() => {
+    showSlide(currentSlide + 1);
+  }, 5000);
+}
+
+function resetAutoSlide() {
+  clearInterval(autoSlideInterval);
+  autoSlide();
+}
+
+// Initialize
+autoSlide();
+
+// Pause on hover
+document.querySelector('.hero-slider').addEventListener('mouseenter', () => {
+  clearInterval(autoSlideInterval);
+});
+
+document.querySelector('.hero-slider').addEventListener('mouseleave', () => {
+  autoSlide();
+});
+</script>
+
+</body>
+</html>
