@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Revolution Style Hero Slider</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Swiper CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/11.0.5/swiper-bundle.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .hero-slider {
+            width: 100%;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .swiper {
+            width: 100%;
+            height: 100%;
+        }
+
+        .swiper-slide {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* Ken Burns Zoom Effect */
+        .slide-bg {
+            position: absolute;
+            top: -10%;
+            left: -10%;
+            width: 120%;
+            height: 120%;
+            background-size: cover;
+            background-position: center;
+            animation: kenBurns 20s ease infinite alternate;
+        }
+
+        @keyframes kenBurns {
+            0% {
+                transform: scale(1) translateX(0);
+            }
+            100% {
+                transform: scale(1.2) translateX(-5%);
+            }
+        }
+
+        /* Animated Particles Background */
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            animation: float 15s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.5;
+            }
+            90% {
+                opacity: 0.5;
+            }
+            100% {
+                transform: translateY(-100vh) translateX(100px);
+                opacity: 0;
+            }
+        }
+
+        /* Gradient Overlay with Animation */
+        .slide-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, 
+                rgba(88, 43, 232, 0.85) 0%, 
+                rgba(255, 0, 135, 0.65) 50%,
+                rgba(255, 159, 0, 0.45) 100%);
+            z-index: 2;
+            mix-blend-mode: multiply;
+        }
+
+        .slide-overlay-2 {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 50%, transparent 0%, rgba(0,0,0,0.6) 100%);
+            z-index: 3;
+        }
+
+        /* Content Container */
+        .slide-content {
+            position: relative;
+            z-index: 10;
+            color: #fff;
+            text-align: left;
+            max-width: 1000px;
+            padding: 0 30px;
+        }
+
+        /* Split Text Effect - Top Line */
+        .slide-subtitle {
+            font-size: 1.2rem;
+            font-weight: 300;
+            letter-spacing: 8px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            opacity: 0;
+            transform: translateY(-30px);
+            display: inline-block;
+            position: relative;
+            padding-left: 60px;
+        }
+
+        .slide-subtitle::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 2px;
+            background: #fff;
+        }
+
+        .swiper-slide-active .slide-subtitle {
+            animation: slideDown 1s ease 0.2s forwards;
+        }
+
+        /* Main Title with Split Effect */
+        .slide-title {
+            font-size: 6rem;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: -2px;
+        }
+
+        .slide-title .word {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(100px) rotateX(-90deg);
+            transform-origin: top center;
+        }
+
+        .swiper-slide-active .slide-title .word:nth-child(1) {
+            animation: flipIn 0.8s cubic-bezier(0.215, 0.610, 0.355, 1.000) 0.4s forwards;
+        }
+
+        .swiper-slide-active .slide-title .word:nth-child(2) {
+            animation: flipIn 0.8s cubic-bezier(0.215, 0.610, 0.355, 1.000) 0.6s forwards;
+        }
+
+        .swiper-slide-active .slide-title .word:nth-child(3) {
+            animation: flipIn 0.8s cubic-bezier(0.215, 0.610, 0.355, 1.000) 0.8s forwards;
+        }
+
+        /* Description with Mask Effect */
+        .slide-description {
+            font-size: 1.3rem;
+            font-weight: 300;
+            line-height: 1.8;
+            margin-bottom: 40px;
+            max-width: 600px;
+            opacity: 0;
+            transform: translateX(-50px);
+        }
+
+        .swiper-slide-active .slide-description {
+            animation: slideRight 1s ease 1s forwards;
+        }
+
+        /* Modern Buttons */
+        .slide-buttons {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .swiper-slide-active .slide-buttons {
+            animation: slideUp 1s ease 1.2s forwards;
+        }
+
+        .btn-modern {
+            padding: 18px 45px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border: none;
+            border-radius: 0;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            z-index: 1;
+        }
+
+        .btn-primary-modern {
+            background: #fff;
+            color: #000;
+        }
+
+        .btn-primary-modern::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #582BE8, #FF0087);
+            transition: all 0.4s ease;
+            z-index: -1;
+        }
+
+        .btn-primary-modern:hover {
+            color: #fff;
+        }
+
+        .btn-primary-modern:hover::before {
+            left: 0;
+        }
+
+        .btn-outline-modern {
+            background: transparent;
+            color: #fff;
+            border: 2px solid #fff;
+            position: relative;
+        }
+
+        .btn-outline-modern::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: #fff;
+            transition: all 0.5s ease;
+            z-index: -1;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+        }
+
+        .btn-outline-modern:hover {
+            color: #000;
+        }
+
+        .btn-outline-modern:hover::before {
+            width: 300%;
+            height: 500%;
+        }
+
+        /* Decorative Elements */
+        .decorative-shape {
+            position: absolute;
+            z-index: 5;
+        }
+
+        .shape-1 {
+            bottom: 10%;
+            right: 10%;
+            width: 200px;
+            height: 200px;
+            border: 3px solid rgba(255,255,255,0.2);
+            border-radius: 50%;
+            animation: rotate 20s linear infinite;
+        }
+
+        .shape-2 {
+            top: 20%;
+            left: 5%;
+            width: 100px;
+            height: 100px;
+            border: 3px solid rgba(255,255,255,0.15);
+            transform: rotate(45deg);
+            animation: float-shape 6s ease-in-out infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes float-shape {
+            0%, 100% { transform: rotate(45deg) translateY(0); }
+            50% { transform: rotate(45deg) translateY(-30px); }
+        }
+
+        /* Custom Navigation */
+        .swiper-button-next,
+        .swiper-button-prev {
+            color: #fff;
+            width: 70px;
+            height: 70px;
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(255,255,255,0.3);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .swiper-button-next:hover,
+        .swiper-button-prev:hover {
+            background: rgba(255,255,255,0.15);
+            border-color: rgba(255,255,255,0.8);
+            transform: scale(1.1);
+        }
+
+        .swiper-button-next::after,
+        .swiper-button-prev::after {
+            font-size: 20px;
+            font-weight: 900;
+        }
+
+        /* Progress Bar Pagination */
+        .swiper-pagination {
+            bottom: 50px !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .swiper-pagination-bullet {
+            width: 50px;
+            height: 4px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 2px;
+            opacity: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .swiper-pagination-bullet-active {
+            background: rgba(255,255,255,0.5);
+        }
+
+        .swiper-pagination-bullet-active::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #fff;
+            animation: progress 5s linear;
+        }
+
+        @keyframes progress {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(0); }
+        }
+
+        /* Slide Number */
+        .slide-number {
+            position: absolute;
+            top: 50px;
+            right: 50px;
+            font-size: 6rem;
+            font-weight: 900;
+            color: rgba(255,255,255,0.05);
+            z-index: 4;
+            line-height: 1;
+        }
+
+        /* Animations */
+        @keyframes slideDown {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideRight {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes flipIn {
+            to {
+                opacity: 1;
+                transform: translateY(0) rotateX(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .slide-title {
+                font-size: 4rem;
+            }
+            
+            .slide-description {
+                font-size: 1.1rem;
+            }
+            
+            .shape-1, .shape-2 {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-slider {
+                height: 80vh;
+            }
+
+            .slide-content {
+                text-align: center;
+                padding: 0 20px;
+            }
+
+            .slide-title {
+                font-size: 3rem;
+            }
+
+            .slide-subtitle {
+                font-size: 0.9rem;
+                letter-spacing: 4px;
+                padding-left: 0;
+            }
+
+            .slide-subtitle::before {
+                display: none;
+            }
+
+            .slide-description {
+                font-size: 1rem;
+                margin: 0 auto 30px;
+            }
+
+            .slide-buttons {
+                justify-content: center;
+            }
+
+            .btn-modern {
+                padding: 15px 35px;
+                font-size: 0.9rem;
+            }
+
+            .swiper-button-next,
+            .swiper-button-prev {
+                width: 50px;
+                height: 50px;
+            }
+
+            .slide-number {
+                top: 30px;
+                right: 30px;
+                font-size: 4rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .slide-title {
+                font-size: 2.5rem;
+            }
+
+            .swiper-button-next,
+            .swiper-button-prev {
+                display: none;
+            }
+
+            .slide-number {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="hero-slider">
+        <div class="swiper mySwiper">
+            <div class="swiper-wrapper">
+                
+                <!-- Slide 1 -->
+                <div class="swiper-slide">
+                    <div class="slide-bg" style="background-image: url('https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=1920');"></div>
+                    
+                    <!-- Particles -->
+                    <div class="particles" id="particles-1"></div>
+                    
+                    <div class="slide-overlay"></div>
+                    <div class="slide-overlay-2"></div>
+                    
+                    <!-- Decorative Shapes -->
+                    <div class="decorative-shape shape-1"></div>
+                    <div class="decorative-shape shape-2"></div>
+                    
+                    <div class="slide-number">01</div>
+                    
+                    <div class="container">
+                        <div class="slide-content">
+                            <div class="slide-subtitle">Creative Agency</div>
+                            <h1 class="slide-title">
+                                <span class="word">DESIGN</span>
+                                <span class="word">THAT</span>
+                                <span class="word">INSPIRES</span>
+                            </h1>
+                            <p class="slide-description">
+                                We create breathtaking digital experiences that captivate your audience and elevate your brand to new heights.
+                            </p>
+                            <div class="slide-buttons">
+                                <button class="btn-modern btn-primary-modern">Start Project</button>
+                                <button class="btn-modern btn-outline-modern">View Work</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 2 -->
+                <div class="swiper-slide">
+                    <div class="slide-bg" style="background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1920');"></div>
+                    
+                    <div class="particles" id="particles-2"></div>
+                    
+                    <div class="slide-overlay"></div>
+                    <div class="slide-overlay-2"></div>
+                    
+                    <div class="decorative-shape shape-1"></div>
+                    <div class="decorative-shape shape-2"></div>
+                    
+                    <div class="slide-number">02</div>
+                    
+                    <div class="container">
+                        <div class="slide-content">
+                            <div class="slide-subtitle">Innovation Driven</div>
+                            <h1 class="slide-title">
+                                <span class="word">BUILD</span>
+                                <span class="word">THE</span>
+                                <span class="word">FUTURE</span>
+                            </h1>
+                            <p class="slide-description">
+                                Transform your vision into reality with cutting-edge technology and innovative solutions that drive real results.
+                            </p>
+                            <div class="slide-buttons">
+                                <button class="btn-modern btn-primary-modern">Get Started</button>
+                                <button class="btn-modern btn-outline-modern">Learn More</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 3 -->
+                <div class="swiper-slide">
+                    <div class="slide-bg" style="background-image: url('https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1920');"></div>
+                    
+                    <div class="particles" id="particles-3"></div>
+                    
+                    <div class="slide-overlay"></div>
+                    <div class="slide-overlay-2"></div>
+                    
+                    <div class="decorative-shape shape-1"></div>
+                    <div class="decorative-shape shape-2"></div>
+                    
+                    <div class="slide-number">03</div>
+                    
+                    <div class="container">
+                        <div class="slide-content">
+                            <div class="slide-subtitle">Performance Focused</div>
+                            <h1 class="slide-title">
+                                <span class="word">SCALE</span>
+                                <span class="word">YOUR</span>
+                                <span class="word">SUCCESS</span>
+                            </h1>
+                            <p class="slide-description">
+                                Unlock exponential growth with strategies designed to maximize impact and accelerate your business forward.
+                            </p>
+                            <div class="slide-buttons">
+                                <button class="btn-modern btn-primary-modern">Contact Us</button>
+                                <button class="btn-modern btn-outline-modern">Case Studies</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+            <div class="swiper-pagination"></div>
+        </div>
+    </div>
+
+    <!-- Swiper JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/11.0.5/swiper-bundle.min.js"></script>
+    
+    <script>
+        // Create particles
+        function createParticles(containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            for (let i = 0; i < 15; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                
+                const size = Math.random() * 60 + 20;
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.bottom = '-100px';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+                
+                container.appendChild(particle);
+            }
+        }
+
+        // Create particles for each slide
+        createParticles('particles-1');
+        createParticles('particles-2');
+        createParticles('particles-3');
+
+        // Initialize Swiper
+        const swiper = new Swiper('.mySwiper', {
+            loop: true,
+            speed: 1500,
+            effect: 'fade',
+            fadeEffect: {
+                crossFade: true
+            },
+            autoplay: {
+                delay: 5000,
+                disableOnInteraction: false,
+            },
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+            },
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true,
+            },
+            keyboard: {
+                enabled: true,
+            },
+            on: {
+                init: function() {
+                    // Reset animations on init
+                    resetAnimations();
+                },
+                slideChange: function() {
+                    // Reset animations on slide change
+                    setTimeout(resetAnimations, 100);
+                }
+            }
+        });
+
+        function resetAnimations() {
+            // This helps reset animations when slides change
+            const activeSlide = document.querySelector('.swiper-slide-active');
+            if (activeSlide) {
+                const elements = activeSlide.querySelectorAll('.slide-subtitle, .slide-title .word, .slide-description, .slide-buttons');
+                elements.forEach(el => {
+                    el.style.animation = 'none';
+                    setTimeout(() => {
+                        el.style.animation = '';
+                    }, 10);
+                });
+            }
+        }
+
+        // Button interactions
+        document.querySelectorAll('.btn-modern').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                console.log('Button clicked:', this.textContent);
+                // Add your custom functionality here
+            });
+        });
+    </script>
+
+</body>
+</html>
