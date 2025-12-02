@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kids Clothing - Modern & Clean Style</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Swiper CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/11.0.5/swiper-bundle.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            background: #FFFFFF;
+        }
+
+        .hero-slider {
+            width: 100%;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(180deg, #F8FAFB 0%, #FFFFFF 100%);
+        }
+
+        .swiper {
+            width: 100%;
+            height: 100%;
+        }
+
+        .swiper-slide {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* Crystal Clear Background - NO overlay */
+        .slide-bg {
+            position: absolute;
+            top: -3%;
+            left: -3%;
+            width: 106%;
+            height: 106%;
+            background-size: cover;
+            background-position: center;
+            animation: subtleFloat 18s ease infinite alternate;
+            filter: brightness(1.05);
+        }
+
+        @keyframes subtleFloat {
+            0% {
+                transform: scale(1) translateY(0);
+            }
+            100% {
+                transform: scale(1.03) translateY(-10px);
+            }
+        }
+
+        /* Minimal Geometric Accents */
+        .geometric-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .geo-circle {
+            position: absolute;
+            border-radius: 50%;
+            border: 2px solid rgba(0, 85, 197, 0.1);
+        }
+
+        .geo-circle-1 {
+            width: 400px;
+            height: 400px;
+            top: -100px;
+            right: -100px;
+            animation: rotate-slow 30s linear infinite;
+        }
+
+        .geo-circle-2 {
+            width: 250px;
+            height: 250px;
+            bottom: 50px;
+            left: -50px;
+            animation: rotate-slow 25s linear infinite reverse;
+        }
+
+        .geo-line {
+            position: absolute;
+            width: 150px;
+            height: 2px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(0, 85, 197, 0.2) 50%, 
+                transparent 100%);
+        }
+
+        .geo-line-1 {
+            top: 20%;
+            left: 10%;
+            animation: slide-line 8s ease infinite;
+        }
+
+        @keyframes rotate-slow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes slide-line {
+            0%, 100% { transform: translateX(0); opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        /* Clean Content Container */
+        .slide-content {
+            position: relative;
+            z-index: 10;
+            color: #1A1A1A;
+            text-align: left;
+            max-width: 1100px;
+            padding: 0 30px;
+            display: flex;
+            align-items: center;
+            gap: 60px;
+        }
+
+        .content-left {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 60px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(0, 85, 197, 0.1);
+        }
+
+        /* Minimalist Badge */
+        .slide-badge {
+            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            opacity: 0;
+            transform: translateY(-15px);
+            color: #0055c5;
+            background: rgba(0, 85, 197, 0.08);
+            padding: 10px 25px;
+            border-radius: 30px;
+            border: 1px solid rgba(0, 85, 197, 0.2);
+        }
+
+        .swiper-slide-active .slide-badge {
+            animation: fadeSlideDown 0.6s ease 0.2s forwards;
+        }
+
+        /* Modern Title */
+        .slide-title {
+            font-size: 4.5rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 25px;
+            font-family: 'Poppins', sans-serif;
+            color: #1A1A1A;
+            letter-spacing: -2px;
+        }
+
+        .slide-title .highlight {
+            color: #0055c5;
+            position: relative;
+        }
+
+        .slide-title .highlight::after {
+            content: '';
+            position: absolute;
+            bottom: 5px;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            background: rgba(0, 85, 197, 0.15);
+            z-index: -1;
+        }
+
+        .slide-title .line {
+            display: block;
+            opacity: 0;
+            transform: translateX(-30px);
+        }
+
+        .swiper-slide-active .slide-title .line:nth-child(1) {
+            animation: slideInRight 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.4s forwards;
+        }
+
+        .swiper-slide-active .slide-title .line:nth-child(2) {
+            animation: slideInRight 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.6s forwards;
+        }
+
+        /* Clean Description */
+        .slide-description {
+            font-size: 1.15rem;
+            font-weight: 400;
+            line-height: 1.8;
+            margin-bottom: 40px;
+            color: #4A5568;
+            opacity: 0;
+        }
+
+        .swiper-slide-active .slide-description {
+            animation: fadeSlideDown 0.8s ease 0.8s forwards;
+        }
+
+        /* Minimalist Buttons */
+        .slide-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            opacity: 0;
+        }
+
+        .swiper-slide-active .slide-buttons {
+            animation: fadeSlideDown 0.8s ease 1s forwards;
+        }
+
+        .btn-clean {
+            padding: 16px 40px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-primary-clean {
+            background: #0055c5;
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(0, 85, 197, 0.25);
+        }
+
+        .btn-primary-clean:hover {
+            background: #003d8f;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 85, 197, 0.35);
+        }
+
+        .btn-outline-clean {
+            background: transparent;
+            color: #0055c5;
+            border: 2px solid #0055c5;
+        }
+
+        .btn-outline-clean:hover {
+            background: #0055c5;
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 85, 197, 0.25);
+        }
+
+        /* Feature Tags */
+        .feature-tags {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+            opacity: 0;
+        }
+
+        .swiper-slide-active .feature-tags {
+            animation: fadeSlideDown 0.8s ease 1.2s forwards;
+        }
+
+        .feature-tag {
+            font-size: 0.85rem;
+            padding: 8px 18px;
+            background: rgba(0, 85, 197, 0.05);
+            border: 1px solid rgba(0, 85, 197, 0.15);
+            border-radius: 20px;
+            color: #0055c5;
+            font-weight: 500;
+        }
+
+        /* Minimal Navigation */
+        .swiper-button-next,
+        .swiper-button-prev {
+            color: #0055c5;
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 85, 197, 0.1);
+        }
+
+        .swiper-button-next:hover,
+        .swiper-button-prev:hover {
+            background: #0055c5;
+            color: #fff;
+            transform: scale(1.05);
+            box-shadow: 0 6px 25px rgba(0, 85, 197, 0.25);
+        }
+
+        .swiper-button-next::after,
+        .swiper-button-prev::after {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        /* Clean Pagination */
+        .swiper-pagination {
+            bottom: 40px !important;
+        }
+
+        .swiper-pagination-bullet {
+            width: 10px;
+            height: 10px;
+            background: #0055c5;
+            opacity: 0.2;
+            transition: all 0.3s ease;
+        }
+
+        .swiper-pagination-bullet-active {
+            opacity: 1;
+            width: 40px;
+            border-radius: 5px;
+        }
+
+        /* Slide Number */
+        .slide-number {
+            position: absolute;
+            top: 40px;
+            right: 40px;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #0055c5;
+            z-index: 15;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 12px 24px;
+            border-radius: 30px;
+            border: 1px solid rgba(0, 85, 197, 0.15);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .slide-number .current {
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+
+        .slide-number .total {
+            color: #CBD5E0;
+        }
+
+        /* Animations */
+        @keyframes fadeSlideDown {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .slide-content {
+                flex-direction: column;
+                gap: 40px;
+            }
+
+            .content-left {
+                padding: 45px;
+            }
+
+            .slide-title {
+                font-size: 3.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-slider {
+                height: 90vh;
+            }
+
+            .slide-content {
+                padding: 0 20px;
+            }
+
+            .content-left {
+                text-align: center;
+                padding: 35px 25px;
+                border-radius: 15px;
+            }
+
+            .slide-title {
+                font-size: 2.8rem;
+                letter-spacing: -1px;
+            }
+
+            .slide-badge {
+                font-size: 0.7rem;
+                letter-spacing: 2px;
+                padding: 8px 20px;
+            }
+
+            .slide-description {
+                font-size: 1rem;
+            }
+
+            .slide-buttons {
+                justify-content: center;
+            }
+
+            .btn-clean {
+                padding: 14px 32px;
+                font-size: 0.9rem;
+            }
+
+            .feature-tags {
+                justify-content: center;
+            }
+
+            .geo-circle-1,
+            .geo-circle-2,
+            .geo-line-1 {
+                display: none;
+            }
+
+            .swiper-button-next,
+            .swiper-button-prev {
+                width: 45px;
+                height: 45px;
+            }
+
+            .slide-number {
+                top: 25px;
+                right: 25px;
+                padding: 10px 18px;
+                font-size: 0.85rem;
+            }
+
+            .slide-number .current {
+                font-size: 1.2rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .slide-title {
+                font-size: 2.2rem;
+            }
+
+            .content-left {
+                padding: 30px 20px;
+            }
+
+            .swiper-button-next,
+            .swiper-button-prev {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="hero-slider">
+        <div class="swiper mySwiper">
+            <div class="swiper-wrapper">
+                
+                <!-- Slide 1 -->
+                <div class="swiper-slide">
+                    <div class="slide-bg" style="background-image: url('https://images.unsplash.com/photo-1503919005314-30d93d07d823?w=1920');"></div>
+                    
+                    <!-- Geometric Accents -->
+                    <div class="geometric-bg">
+                        <div class="geo-circle geo-circle-1"></div>
+                        <div class="geo-circle geo-circle-2"></div>
+                        <div class="geo-line geo-line-1"></div>
+                    </div>
+                    
+                    <div class="slide-number">
+                        <span class="current">01</span>
+                        <span class="total"> / 03</span>
+                    </div>
+                    
+                    <div class="container">
+                        <div class="slide-content">
+                            <div class="content-left">
+                                <div class="slide-badge">New Collection</div>
+                                <h1 class="slide-title">
+                                    <span class="line">Premium <span class="highlight">Kids</span></span>
+                                    <span class="line">Fashion</span>
+                                </h1>
+                                <p class="slide-description">
+                                    Thoughtfully designed clothing that combines style, comfort, and quality. Perfect for every moment in your child's day.
+                                </p>
+                                <div class="slide-buttons">
+                                    <button class="btn-clean btn-primary-clean">Shop Collection</button>
+                                    <button class="btn-clean btn-outline-clean">View Lookbook</button>
+                                </div>
+                                <div class="feature-tags">
+                                    <span class="feature-tag">✓ Premium Fabrics</span>
+                                    <span class="feature-tag">✓ Easy Care</span>
+                                    <span class="feature-tag">✓ Free Shipping</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 2 -->
+                <div class="swiper-slide">
+                    <div class="slide-bg" style="background-image: url('https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?w=1920');"></div>
+                    
+                    <div class="geometric-bg">
+                        <div class="geo-circle geo-circle-1"></div>
+                        <div class="geo-circle geo-circle-2"></div>
+                        <div class="geo-line geo-line-1"></div>
+                    </div>
+                    
+                    <div class="slide-number">
+                        <span class="current">02</span>
+                        <span class="total"> / 03</span>
+                    </div>
+                    
+                    <div class="container">
+                        <div class="slide-content">
+                            <div class="content-left">
+                                <div class="slide-badge">Comfort Essentials</div>
+                                <h1 class="slide-title">
+                                    <span class="line"><span class="highlight">Soft</span> & Gentle</span>
+                                    <span class="line">For Everyday</span>
+                                </h1>
+                                <p class="slide-description">
+                                    Expertly crafted from breathable, skin-friendly materials. Designed for active kids who love to move, play, and explore.
+                                </p>
+                                <div class="slide-buttons">
+                                    <button class="btn-clean btn-primary-clean">Discover More</button>
+                                    <button class="btn-clean btn-outline-clean">Size Guide</button>
+                                </div>
+                                <div class="feature-tags">
+                                    <span class="feature-tag">✓ Hypoallergenic</span>
+                                    <span class="feature-tag">✓ Durable</span>
+                                    <span class="feature-tag">✓ Eco-Friendly</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 3 -->
+                <div class="swiper-slide">
+                    <div class="slide-bg" style="background-image: url('https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=1920');"></div>
+                    
+                    <div class="geometric-bg">
+                        <div class="geo-circle geo-circle-1"></div>
+                        <div class="geo-circle geo-circle-2"></div>
+                        <div class="geo-line geo-line-1"></div>
+                    </div>
+                    
+                    <div class="slide-number">
+                        <span class="current">03</span>
+                        <span class="total"> / 03</span>
+                    </div>
+                    
+                    <div class="container">
+                        <div class="slide-content">
+                            <div class="content-left">
+                                <div class="slide-badge">Limited Offer</div>
+                                <h1 class="slide-title">
+                                    <span class="line"><span class="highlight">Quality</span> That</span>
+                                    <span class="line">Lasts</span>
+                                </h1>
+                                <p class="slide-description">
+                                    Invest in clothing that grows with your child. Our durable designs maintain their beauty wash after wash, season after season.
+                                </p>
+                                <div class="slide-buttons">
+                                    <button class="btn-clean btn-primary-clean">Shop Now</button>
+                                    <button class="btn-clean btn-outline-clean">Learn More</button>
+                                </div>
+                                <div class="feature-tags">
+                                    <span class="feature-tag">✓ 100% Quality</span>
+                                    <span class="feature-tag">✓ Safe Materials</span>
+                                    <span class="feature-tag">✓ Easy Returns</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+            <div class="swiper-pagination"></div>
+        </div>
+    </div>
+
+    <!-- Swiper JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/11.0.5/swiper-bundle.min.js"></script>
+    
+    <script>
+        // Initialize Swiper
+        const swiper = new Swiper('.mySwiper', {
+            loop: true,
+            speed: 1200,
+            effect: 'fade',
+            fadeEffect: {
+                crossFade: true
+            },
+            autoplay: {
+                delay: 5500,
+                disableOnInteraction: false,
+            },
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+            },
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true,
+            },
+            keyboard: {
+                enabled: true,
+            }
+        });
+
+        // Button interactions
+        document.querySelectorAll('.btn-clean').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                console.log('Button clicked:', this.textContent);
+            });
+        });
+    </script>
+
+</body>
+</html>
