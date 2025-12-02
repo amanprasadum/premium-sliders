@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kids Clothing - Soft & Sweet Style</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Swiper CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/11.0.5/swiper-bundle.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&family=Fredoka:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Quicksand', sans-serif;
+            overflow-x: hidden;
+            background: #FFF5F7;
+        }
+
+        .hero-slider {
+            width: 100%;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .swiper {
+            width: 100%;
+            height: 100%;
+        }
+
+        .swiper-slide {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* Bright Background with Gentle Zoom */
+        .slide-bg {
+            position: absolute;
+            top: -5%;
+            left: -5%;
+            width: 110%;
+            height: 110%;
+            background-size: cover;
+            background-position: center;
+            animation: gentleZoom 15s ease infinite alternate;
+            filter: brightness(1.1) saturate(1.2);
+        }
+
+        @keyframes gentleZoom {
+            0% {
+                transform: scale(1);
+            }
+            100% {
+                transform: scale(1.05);
+            }
+        }
+
+        /* Light Pastel Overlay - Very Subtle */
+        .slide-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, 
+                rgba(255, 182, 193, 0.15) 0%,
+                rgba(173, 216, 230, 0.15) 50%,
+                rgba(255, 218, 185, 0.15) 100%);
+            z-index: 2;
+        }
+
+        /* Floating Bubbles */
+        .bubbles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 3;
+            pointer-events: none;
+        }
+
+        .bubble {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, 
+                rgba(255, 255, 255, 0.8), 
+                rgba(255, 182, 193, 0.3));
+            box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.5),
+                        0 5px 15px rgba(255, 182, 193, 0.3);
+            animation: floatBubble 12s infinite ease-in-out;
+        }
+
+        @keyframes floatBubble {
+            0%, 100% {
+                transform: translateY(0) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.6;
+            }
+            90% {
+                opacity: 0.6;
+            }
+            100% {
+                transform: translateY(-120vh) translateX(50px);
+                opacity: 0;
+            }
+        }
+
+        /* Decorative Hearts & Stars */
+        .decorative-icons {
+            position: absolute;
+            z-index: 4;
+            pointer-events: none;
+        }
+
+        .heart, .star {
+            position: absolute;
+            font-size: 2rem;
+            animation: float-icon 6s ease-in-out infinite;
+        }
+
+        .heart {
+            color: #FFB6C1;
+            top: 20%;
+            right: 15%;
+            animation-delay: 0s;
+        }
+
+        .star {
+            color: #FFE4B5;
+            bottom: 25%;
+            left: 10%;
+            animation-delay: 2s;
+        }
+
+        @keyframes float-icon {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
+        }
+
+        /* Content Container */
+        .slide-content {
+            position: relative;
+            z-index: 10;
+            color: #5A4A6B;
+            text-align: left;
+            max-width: 900px;
+            padding: 0 30px;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            padding: 60px;
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(255, 182, 193, 0.3);
+        }
+
+        /* Subtitle */
+        .slide-subtitle {
+            font-size: 1rem;
+            font-weight: 500;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            opacity: 0;
+            transform: translateY(-20px);
+            color: #FF69B4;
+            font-family: 'Fredoka', sans-serif;
+        }
+
+        .swiper-slide-active .slide-subtitle {
+            animation: gentleFadeIn 0.8s ease 0.2s forwards;
+        }
+
+        /* Main Title */
+        .slide-title {
+            font-size: 4.5rem;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 25px;
+            font-family: 'Fredoka', sans-serif;
+            color: #5A4A6B;
+        }
+
+        .slide-title .word {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .swiper-slide-active .slide-title .word:nth-child(1) {
+            animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.4s forwards;
+        }
+
+        .swiper-slide-active .slide-title .word:nth-child(2) {
+            animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.6s forwards;
+        }
+
+        .swiper-slide-active .slide-title .word:nth-child(3) {
+            animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.8s forwards;
+        }
+
+        /* Description */
+        .slide-description {
+            font-size: 1.2rem;
+            font-weight: 400;
+            line-height: 1.8;
+            margin-bottom: 35px;
+            max-width: 550px;
+            opacity: 0;
+            color: #6B5B7A;
+        }
+
+        .swiper-slide-active .slide-description {
+            animation: gentleFadeIn 0.8s ease 1s forwards;
+        }
+
+        /* Sweet Buttons */
+        .slide-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            opacity: 0;
+        }
+
+        .swiper-slide-active .slide-buttons {
+            animation: gentleFadeIn 0.8s ease 1.2s forwards;
+        }
+
+        .btn-sweet {
+            padding: 16px 40px;
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .btn-primary-sweet {
+            background: linear-gradient(135deg, #FFB6C1 0%, #FFC0CB 100%);
+            color: #fff;
+        }
+
+        .btn-primary-sweet:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 10px 25px rgba(255, 182, 193, 0.4);
+        }
+
+        .btn-outline-sweet {
+            background: #fff;
+            color: #FF69B4;
+            border: 2px solid #FFB6C1;
+        }
+
+        .btn-outline-sweet:hover {
+            background: linear-gradient(135deg, #FFB6C1 0%, #FFC0CB 100%);
+            color: #fff;
+            transform: translateY(-3px) scale(1.05);
+        }
+
+        /* Navigation */
+        .swiper-button-next,
+        .swiper-button-prev {
+            color: #FF69B4;
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            box-shadow: 0 5px 20px rgba(255, 182, 193, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .swiper-button-next:hover,
+        .swiper-button-prev:hover {
+            background: #FFB6C1;
+            color: #fff;
+            transform: scale(1.1);
+        }
+
+        .swiper-button-next::after,
+        .swiper-button-prev::after {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        /* Cute Pagination */
+        .swiper-pagination {
+            bottom: 40px !important;
+        }
+
+        .swiper-pagination-bullet {
+            width: 12px;
+            height: 12px;
+            background: #FFB6C1;
+            opacity: 0.3;
+            transition: all 0.3s ease;
+        }
+
+        .swiper-pagination-bullet-active {
+            opacity: 1;
+            width: 35px;
+            border-radius: 6px;
+            background: linear-gradient(135deg, #FFB6C1 0%, #FF69B4 100%);
+        }
+
+        /* Animations */
+        @keyframes gentleFadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes bounceIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .slide-title {
+                font-size: 3.5rem;
+            }
+            
+            .slide-content {
+                padding: 40px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-slider {
+                height: 85vh;
+            }
+
+            .slide-content {
+                text-align: center;
+                padding: 30px 20px;
+                border-radius: 20px;
+            }
+
+            .slide-title {
+                font-size: 2.8rem;
+            }
+
+            .slide-subtitle {
+                font-size: 0.9rem;
+                letter-spacing: 2px;
+            }
+
+            .slide-description {
+                font-size: 1rem;
+                margin: 0 auto 25px;
+            }
+
+            .slide-buttons {
+                justify-content: center;
+            }
+
+            .btn-sweet {
+                padding: 14px 30px;
+                font-size: 0.95rem;
+            }
+
+            .heart, .star {
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .slide-title {
+                font-size: 2.2rem;
+            }
+
+            .swiper-button-next,
+            .swiper-button-prev {
+                width: 45px;
+                height: 45px;
+            }
+
+            .slide-content {
+                padding: 25px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="hero-slider">
+        <div class="swiper mySwiper">
+            <div class="swiper-wrapper">
+                
+                <!-- Slide 1 -->
+                <div class="swiper-slide">
+                    <div class="slide-bg" style="background-image: url('https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?w=1920');"></div>
+                    
+                    <!-- Bubbles -->
+                    <div class="bubbles" id="bubbles-1"></div>
+                    
+                    <div class="slide-overlay"></div>
+                    
+                    <!-- Decorative Icons -->
+                    <div class="decorative-icons">
+                        <div class="heart">❤</div>
+                        <div class="star">⭐</div>
+                    </div>
+                    
+                    <div class="container">
+                        <div class="slide-content">
+                            <div class="slide-subtitle">New Collection 2024</div>
+                            <h1 class="slide-title">
+                                <span class="word">Adorable</span>
+                                <span class="word">Kids</span>
+                                <span class="word">Fashion</span>
+                            </h1>
+                            <p class="slide-description">
+                                Discover our soft, comfortable clothing designed with love for your little ones. Quality fabrics that feel like a gentle hug!
+                            </p>
+                            <div class="slide-buttons">
+                                <button class="btn-sweet btn-primary-sweet">Shop Now</button>
+                                <button class="btn-sweet btn-outline-sweet">View Collection</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 2 -->
+                <div class="swiper-slide">
+                    <div class="slide-bg" style="background-image: url('https://images.unsplash.com/photo-1503919005314-30d93d07d823?w=1920');"></div>
+                    
+                    <div class="bubbles" id="bubbles-2"></div>
+                    
+                    <div class="slide-overlay"></div>
+                    
+                    <div class="decorative-icons">
+                        <div class="heart">💕</div>
+                        <div class="star">✨</div>
+                    </div>
+                    
+                    <div class="container">
+                        <div class="slide-content">
+                            <div class="slide-subtitle">Comfort First</div>
+                            <h1 class="slide-title">
+                                <span class="word">Cozy</span>
+                                <span class="word">&</span>
+                                <span class="word">Cute</span>
+                            </h1>
+                            <p class="slide-description">
+                                Super soft materials that are gentle on delicate skin. Let your babies play, explore, and dream in pure comfort!
+                            </p>
+                            <div class="slide-buttons">
+                                <button class="btn-sweet btn-primary-sweet">Explore More</button>
+                                <button class="btn-sweet btn-outline-sweet">Best Sellers</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 3 -->
+                <div class="swiper-slide">
+                    <div class="slide-bg" style="background-image: url('https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=1920');"></div>
+                    
+                    <div class="bubbles" id="bubbles-3"></div>
+                    
+                    <div class="slide-overlay"></div>
+                    
+                    <div class="decorative-icons">
+                        <div class="heart">🌸</div>
+                        <div class="star">🦋</div>
+                    </div>
+                    
+                    <div class="container">
+                        <div class="slide-content">
+                            <div class="slide-subtitle">Special Offer</div>
+                            <h1 class="slide-title">
+                                <span class="word">Sweet</span>
+                                <span class="word">Little</span>
+                                <span class="word">Ones</span>
+                            </h1>
+                            <p class="slide-description">
+                                Dress your angels in the finest quality clothing. Made with love, care, and attention to every tiny detail!
+                            </p>
+                            <div class="slide-buttons">
+                                <button class="btn-sweet btn-primary-sweet">Shop Sale</button>
+                                <button class="btn-sweet btn-outline-sweet">Gift Ideas</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+            <div class="swiper-pagination"></div>
+        </div>
+    </div>
+
+    <!-- Swiper JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/11.0.5/swiper-bundle.min.js"></script>
+    
+    <script>
+        // Create bubbles
+        function createBubbles(containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            for (let i = 0; i < 10; i++) {
+                const bubble = document.createElement('div');
+                bubble.className = 'bubble';
+                
+                const size = Math.random() * 80 + 30;
+                bubble.style.width = size + 'px';
+                bubble.style.height = size + 'px';
+                bubble.style.left = Math.random() * 100 + '%';
+                bubble.style.bottom = '-100px';
+                bubble.style.animationDelay = Math.random() * 12 + 's';
+                bubble.style.animationDuration = (Math.random() * 8 + 10) + 's';
+                
+                container.appendChild(bubble);
+            }
+        }
+
+        createBubbles('bubbles-1');
+        createBubbles('bubbles-2');
+        createBubbles('bubbles-3');
+
+        // Initialize Swiper
+        const swiper = new Swiper('.mySwiper', {
+            loop: true,
+            speed: 1200,
+            effect: 'fade',
+            fadeEffect: {
+                crossFade: true
+            },
+            autoplay: {
+                delay: 5000,
+                disableOnInteraction: false,
+            },
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+            },
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true,
+            },
+            keyboard: {
+                enabled: true,
+            }
+        });
+
+        // Button interactions
+        document.querySelectorAll('.btn-sweet').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                console.log('Button clicked:', this.textContent);
+            });
+        });
+    </script>
+
+</body>
+</html>
